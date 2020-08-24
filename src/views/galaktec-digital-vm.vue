@@ -19,7 +19,7 @@
       <div class="editor-container">
         <textarea ref="editor"></textarea>
       </div>
-      <div class="editor-cmd-panel">
+      <div class="cmd-panel">
         <div class="cmd-container">
           <div class="fill x1 spacer-top"></div>
           <button class="cmd-item x2 spacer-top">Load</button>
@@ -30,8 +30,7 @@
         </div>
       </div>
     </div>
-    <div class="item"></div>
-
+    <VirtualMachine />
     <knife layout="bottom-left"
            kind="blade" />
     <knife layout="bottom-right"
@@ -48,10 +47,8 @@
   .container {
     --ux-bar-container-split: 45%;
     --ux-bar-blade-rad: 100px 60px;
-
     --ux-bar-handle-end-cap-rad-top: 5px;
     --ux-bar-handle-end-cap-rad-bottom: 5px;
-
     --ux-bar-handle-trans-radius: 60px 30px;
 
     height: 100%;
@@ -86,72 +83,15 @@
       }
     }
 
-    .editor-cmd-panel {
-      display: flex;
-      flex-direction: column;
 
-      .vert-spacer {
-        flex: 1;
-        background: var(--background-color);
-      }
-    }
 
-    .cmd-container {
-      background: var(--background-color);
-      flex: 0.5;
-      display: flex;
-      flex-direction: column;
 
-      .spacer-top {
-        margin-top: 3px;
-      }
-
-      .spacer-bottom {
-        margin-bottom: 3px;
-      }
-
-      .x1 {
-        height: 4em;
-      }
-
-      .x2 {
-        height: 10em;
-      }
-
-      .xf {
-        height: 100%;
-      }
-
-      .cmd-item {
-        border: 0;
-        padding: 5px 10px;
-        background: var(--mk-pink);
-        color: var(--on-secondary-color);
-        width: 100%;
-
-        font-family: "Orbitron", sans-serif;;
-        text-transform: uppercase;
-        font-weight: 700;
-
-        cursor: pointer;
-      }
-
-      .cmd-item:active {
-        background: var(--primary-color);
-        color: var(--background-color);
-      }
-
-      .fill {
-        background: var(--primary-color);
-        width: 100%;
-      }
-    }
 
     .app-title {
       font-family: 'Orbitron', sans-serif;;
 
       .main-title {
-        margin-left: 100px;
+        margin-left: 150px;
       }
 
       h1 {
@@ -178,11 +118,13 @@ declare const CodeMirror: any;
 
 import { defineComponent, ref, onMounted } from 'vue';
 import Knife from '../components/theme/Knife.vue';
+import VirtualMachine from '../components/VirtualMachine.vue';
 
 export default defineComponent({
   name: 'galaktec-digital-vm',
   components: {
-    Knife
+    Knife,
+    VirtualMachine
   },
   setup() {
     const editor = ref(null);

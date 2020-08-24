@@ -1,5 +1,5 @@
 <template>
-  <div class="blade brushed-metal"
+  <div class="blade"
        :class="[ `${ layoutModel.vertical }-${ layoutModel.horizontal }` ]">
   </div>
 </template>

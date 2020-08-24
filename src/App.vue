@@ -20,7 +20,7 @@ export default defineComponent({
   --mk-orange: #FC9867;
 
   --primary-color: var(--mk-green);
-  --secondary-color: var(--mk-purple);
+  --secondary-color: var(--mk-pink);
   --surface-color: var(--mk-blue);
   --background-color: #212121;
   --error-color: var(--mk-orange);
@@ -63,5 +63,66 @@ body {
   left:0;
   right:0;
   height:100%;
+}
+
+.cmd-panel {
+  display: flex;
+  flex-direction: column;
+
+  .vert-spacer {
+    flex: 1;
+    background: var(--background-color);
+  }
+}
+
+.cmd-container {
+  background: var(--background-color);
+  flex: 0.5;
+  display: flex;
+  flex-direction: column;
+
+  .spacer-top {
+    margin-top: 3px;
+  }
+
+  .spacer-bottom {
+    margin-bottom: 3px;
+  }
+
+  .x1 {
+    height: 4em;
+  }
+
+  .x2 {
+    height: 10em;
+  }
+
+  .xf {
+    height: 100%;
+  }
+
+  .cmd-item {
+    border: 0;
+    padding: 5px 10px;
+    background: var(--secondary-color);
+    color: var(--on-secondary-color);
+    width: 100%;
+
+    font-family: "Orbitron", sans-serif;;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    cursor: pointer;
+  }
+
+  .cmd-item:active {
+    background: var(--primary-color);
+    color: var(--background-color);
+  }
+
+  .fill {
+    background: var(--primary-color);
+    width: 100%;
+  }
 }
 </style>
