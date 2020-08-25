@@ -6,7 +6,7 @@ const protoMemoryLayout: MemoryRegion[] = [
   {
     regionName: 'program',
     startAddress: 0x0,
-    lengthInBytes: 64,
+    lengthInBytes: 128,
     accessWidthInBytes: 1,
     clockCyclesForWrite: 4,
     clockCyclesForRead: 4,

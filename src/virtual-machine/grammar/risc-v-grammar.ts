@@ -35,7 +35,7 @@ const lexer = moo.compile({
 
 interface NearleyToken {  value: any;
   [key: string]: any;
-};
+}
 
 interface NearleyLexer {
   reset: (chunk: string, info: any) => void;
@@ -60,6 +60,7 @@ interface Grammar {
 };
 
 const grammar: Grammar = {
+  // @ts-ignore
   Lexer: lexer,
   ParserRules: [
     {"name": "program$ebnf$1", "symbols": []},

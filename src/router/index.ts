@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import galaktecDigitalVm from '../views/galaktec-digital-vm.vue'
+import galaktecDigitalVm from '../views/GalaktecDigitalVm.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'galaktech-digital-vm',
+    name: 'GalaktechDigitalVm',
     component: galaktecDigitalVm
   }
 ]

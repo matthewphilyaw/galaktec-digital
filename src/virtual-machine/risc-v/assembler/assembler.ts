@@ -39,7 +39,7 @@ export class AssemblerContext {
   }
 }
 
-export function assemble(program: Buffer, targetMemSize: number): AssemblerContext {
+export function assemble(program: string, targetMemSize: number): AssemblerContext {
   const parser = new Parser(Grammar.fromCompiled(riscVGrammar));
 
   const ctx = new AssemblerContext(targetMemSize);

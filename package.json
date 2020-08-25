@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "nunjucks": "^3.2.1",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0",
-    "nunjucks": "^3.2.1"
+    "vuex": "^4.0.0-beta.4",
+    "nearley": "^2.19.3"
   },
   "devDependencies": {
     "@types/moo": "^0.5.3",

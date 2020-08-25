@@ -19,6 +19,8 @@ export default defineComponent({
   --mk-yellow: #FFD866;
   --mk-orange: #FC9867;
 
+  --mk-yellow-trans: #FFD86640;
+
   --primary-color: var(--mk-green);
   --secondary-color: var(--mk-pink);
   --surface-color: var(--mk-blue);
@@ -90,11 +92,11 @@ body {
   }
 
   .x1 {
-    height: 4em;
+    height: 60px;
   }
 
   .x2 {
-    height: 10em;
+    height: 120px;
   }
 
   .xf {
@@ -103,7 +105,7 @@ body {
 
   .cmd-item {
     border: 0;
-    padding: 5px 10px;
+    padding: 0;
     background: var(--secondary-color);
     color: var(--on-secondary-color);
     width: 100%;

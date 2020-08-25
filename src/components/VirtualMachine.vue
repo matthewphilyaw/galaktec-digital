@@ -5,24 +5,62 @@
            kind="handle" />
     <Knife layout="top-right"
            kind="blade" />
-    <div>
-      Program Mem
+
+    <div class="stats-container">
+      <div class="header">
+        <div v-if="programDump">{{ `${programDump.regionInfo.regionName} | ${programDump.regionInfo.lengthInBytes} (bytes)` }}</div>
+      </div>
+      <div v-if="programDump"
+           v-for="row in programDump.formattedLines"
+           class="addr-line">
+        <div class="addr-start">{{ row[0] }}</div>
+        <div class="addr-value">{{ row[1] }}</div>
+      </div>
     </div>
-    <div>
-      Ram
+    <div class="stats-container">
+      <div class="header">
+        <div v-if="ramDump">{{ `${ramDump.regionInfo.regionName} | ${ramDump.regionInfo.lengthInBytes} (bytes)` }}</div>
+      </div>
+      <div v-if="ramDump"
+           v-for="row in ramDump.formattedLines"
+           class="addr-line">
+        <div class="addr-start">{{ row[0] }}</div>
+        <div class="addr-value">{{ row[1] }}</div>
+      </div>
     </div>
-    <div>
-      Reg
+    <div class="stats-container">
+      <div class="header">
+        <div v-if="registerDump">Registers</div>
+      </div>
+      <div v-if="registerDump"
+           v-for="row in registerDump"
+           class="addr-line">
+        <div class="addr-start" v-if="row[0].length === 2">&nbsp;{{ row[0] }}</div>
+        <div class="addr-start" v-if="row[0].length === 3">{{ row[0] }}</div>
+        <div class="addr-value">{{ row[1] }}</div>
+      </div>
     </div>
-    <div>
-      stats
+    <div class="stats-container">
+      <pre>{{ JSON.stringify(cpuState, null, 2) }}</pre>
     </div>
     <div class="cmd-panel">
       <div class="cmd-container">
         <div class="fill x1 spacer-top"></div>
-        <button class="cmd-item x1 spacer-top">Reset</button>
+        <div class="fill x1 spacer-top"
+             v-if="!programLoaded"></div>
+        <button class="cmd-item x1 spacer-top"
+                v-if="programLoaded"
+                @click="reset()">
+          Reset
+        </button>
         <div class="fill x2 spacer-top"></div>
-        <button class="cmd-item x2 spacer-top">Step</button>
+        <div class="fill x2 spacer-top"
+             v-if="!programLoaded || vmHalted" ></div>
+        <button class="cmd-item x2 spacer-top"
+                v-if="programLoaded && !vmHalted"
+                @click="step()">
+          Step
+        </button>
         <div class="fill xf spacer-top"></div>
       </div>
       <div class="vert-spacer">
@@ -33,13 +71,105 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
+import { useStore, mapState } from 'vuex';
 import Knife from '../components/theme/Knife.vue';
+import { RESET_VM, STEP_VM } from '@/store/mutations';
+import { RootState } from '@/store';
+import { MemoryRegionDump } from '@/virtual-machine/risc-v/cpu-cores/peripherals/memory';
+import { binByte } from '@/virtual-machine/utils/binary-string-formatter';
 
 export default defineComponent({
   name: 'VirtualMachine' ,
   components: {
     Knife
+  },
+  setup() {
+    const store = useStore<RootState>();
+
+    function formatMemoryDump(dump?: MemoryRegionDump): string[][] {
+      const addrLines: string[][] = [];
+
+      if (!dump) {
+        return addrLines;
+      }
+
+      const rbDv = new DataView(dump.regionBuffer);
+      for (let row = 0; row < dump.regionBuffer.byteLength; row+=4) {
+        const line: string[] = [];
+
+        const address = dump.regionInfo.startAddress + row;
+        line.push(address.toString(16).padStart(4, '0'));
+        for (let col = 0; col < 4; col++) {
+          const value = rbDv.getUint32(row, true);
+          line.push(value.toString(16).padStart(8, '0'));
+        }
+
+        addrLines.push(line);
+      }
+
+      return addrLines;
+    }
+
+    const programLoaded = computed(() => store.state.programLoaded);
+    const vmHalted = computed(() => store.state.vmHalted);
+    const programDump = computed(() => {
+      if (!store.state.programDump) {
+        return undefined;
+      }
+
+      const regionInfo = store.state.programDump.regionInfo;
+
+      return {
+        regionInfo,
+        formattedLines: formatMemoryDump(store.state.programDump)
+      }
+    });
+    const ramDump = computed(() => {
+      if (!store.state.ramDump) {
+        return undefined;
+      }
+
+      const regionInfo = store.state.ramDump.regionInfo;
+
+      return {
+        regionInfo,
+        formattedLines: formatMemoryDump(store.state.ramDump)
+      }
+    });
+
+    const cpuState = computed(() => store.state.cpuState);
+    const registerDump = computed(() => {
+      const formattedReg: string[][] = [];
+      const registerDump = store.state.registerDump;
+
+      if (!store.state.cpuState) {
+        return formattedReg;
+      }
+
+      console.log('running mem');
+
+      for (let i = 0; i < 32; i++) {
+        formattedReg.push([
+          `x${i.toString()}`,
+          store.state.cpuState.registers[i].toString(16).padEnd(8, '0')
+        ])
+      }
+
+      return formattedReg;
+    });
+
+
+    return {
+      reset: () => store.commit(RESET_VM),
+      step: () => store.commit(STEP_VM),
+      programLoaded,
+      vmHalted,
+      programDump,
+      ramDump,
+      cpuState,
+      registerDump
+    }
   }
 });
 </script>
@@ -58,12 +188,39 @@ export default defineComponent({
     margin: 0;
     padding: 0.5rem 1rem;
     display: grid;
-    grid-template-columns: auto auto auto auto 70px;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 70px;
     grid-template-rows: 35px auto;
 
     .top-handle {
       grid-column-start: 1;
       grid-column-end: 5;
     }
+
+    .stats-container {
+      border-right: 2px solid var(--mk-yellow-trans);
+      border-bottom: 2px solid var(--mk-yellow-trans);
+      border-radius: 5px;
+
+      .header {
+        display: flex;
+        margin-bottom: 10px;
+        justify-content: center;
+        font-family: "Orbitron", sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+      }
+
+      .addr-line {
+        display: flex;
+        font-family: 'Roboto Mono', monospace;
+        .addr-start {
+          padding-right: 5px;
+          margin-right: 5px;
+          margin-left: 5px;
+          border-right: 1px solid var(--mk-yellow-trans);
+        }
+      }
+    }
+
   }
 </style>

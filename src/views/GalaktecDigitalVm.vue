@@ -22,7 +22,10 @@
       <div class="cmd-panel">
         <div class="cmd-container">
           <div class="fill x1 spacer-top"></div>
-          <button class="cmd-item x2 spacer-top">Load</button>
+          <button class="cmd-item x2 spacer-top"
+                  @click="loadProgram()">
+            Load
+          </button>
           <div class="fill xf spacer-top"></div>
         </div>
         <div class="vert-spacer">
@@ -114,34 +117,48 @@
 
 <script lang="ts">
 
+
 declare const CodeMirror: any;
 
 import { defineComponent, ref, onMounted } from 'vue';
+import { useStore } from 'vuex';
 import Knife from '../components/theme/Knife.vue';
+
+import { LOAD_PROGRAM } from '../store/mutations';
 import VirtualMachine from '../components/VirtualMachine.vue';
+import { sampleProgram } from '../virtual-machine/default-program';
 
 export default defineComponent({
-  name: 'galaktec-digital-vm',
+  name: 'GalaktecDigitalVm',
   components: {
     Knife,
     VirtualMachine
   },
   setup() {
+    const store = useStore();
     const editor = ref(null);
+    let codeMirror: any;
 
     onMounted(() => {
       const editorDiv = editor.value;
-      const codeMirror = CodeMirror.fromTextArea(editorDiv, {
+      codeMirror = CodeMirror.fromTextArea(editorDiv, {
         lineNumbers: true,
         mode: 'gas',
         theme: 'material-darker',
         scrollbarStyle: 'overlay'
       });
 
+      codeMirror.setValue(sampleProgram);
     });
 
+    function loadProgram() {
+      const program = codeMirror.getValue();
+      store.commit(LOAD_PROGRAM, program);
+    }
+
     return {
-      editor
+      editor,
+      loadProgram
     };
   }
 });
