@@ -88,11 +88,11 @@
 
 
     .app-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-items: center;
       font-family: 'Orbitron', sans-serif;;
-
-      .main-title {
-        margin-left: 150px;
-      }
 
       h1 {
         padding: 0;
