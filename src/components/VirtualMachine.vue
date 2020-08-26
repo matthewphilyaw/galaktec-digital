@@ -10,22 +10,33 @@
       <div class="header">
         <div v-if="programDump">{{ `${programDump.regionInfo.regionName} | ${programDump.regionInfo.lengthInBytes} (bytes)` }}</div>
       </div>
-      <div v-if="programDump"
-           v-for="row in programDump.formattedLines"
-           class="addr-line">
-        <div class="addr-start">{{ row[0] }}</div>
-        <div class="addr-value">{{ row[1] }}</div>
+      <div class="addr-container">
+        <div v-if="programDump"
+             v-for="row in programDump.formattedLines"
+             class="addr-line"
+             :class="row[0] === programCounter.toString(16).padStart(8, '0') ? 'current-line' : 'other-line'">
+          <div class="addr-start">{{ row[0] }}</div>
+          <div class="addr-value-line">
+            <div class="addr-value"
+                 v-for="col in row.slice(1)">{{ col }}</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="stats-container">
       <div class="header">
         <div v-if="ramDump">{{ `${ramDump.regionInfo.regionName} | ${ramDump.regionInfo.lengthInBytes} (bytes)` }}</div>
       </div>
-      <div v-if="ramDump"
-           v-for="row in ramDump.formattedLines"
-           class="addr-line">
-        <div class="addr-start">{{ row[0] }}</div>
-        <div class="addr-value">{{ row[1] }}</div>
+      <div class="addr-container">
+        <div v-if="ramDump"
+             v-for="row in ramDump.formattedLines"
+             class="addr-line">
+          <div class="addr-start">{{ row[0] }}</div>
+          <div class="addr-value-line">
+            <div class="addr-value"
+                 v-for="col in row.slice(1)">{{ col }}</div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="stats-container">
@@ -41,7 +52,17 @@
       </div>
     </div>
     <div class="stats-container">
-      <pre>{{ JSON.stringify(cpuState, null, 2) }}</pre>
+      <div class="header">CPU STATE</div>
+      <div class="state-container">
+        <div class="state-group">
+          <div class="state-header">
+            Program Counter (PC)
+          </div>
+          <div class="state-content program-counter">
+            {{ programCounter.toString(16).padStart(8, '0') }}
+          </div>
+        </div>
+      </div>
     </div>
     <div class="cmd-panel">
       <div class="cmd-container">
@@ -53,7 +74,15 @@
                 @click="reset()">
           Reset
         </button>
-        <div class="fill x2 spacer-top"></div>
+        <div class="fill x1 spacer-top"></div>
+        <div class="fill x2 spacer-top"
+             v-if="!programLoaded || vmHalted" ></div>
+        <button class="cmd-item x2 spacer-top"
+                v-if="programLoaded && !vmHalted"
+                @click="next()">
+          Next
+        </button>
+        <div class="fill x1 spacer-top"></div>
         <div class="fill x2 spacer-top"
              v-if="!programLoaded || vmHalted" ></div>
         <button class="cmd-item x2 spacer-top"
@@ -74,7 +103,7 @@
 import { defineComponent, computed } from 'vue';
 import { useStore, mapState } from 'vuex';
 import Knife from '../components/theme/Knife.vue';
-import { RESET_VM, STEP_VM } from '@/store/mutations';
+import { RESET_VM, STEP_VM, NEXT_VM } from '@/store/mutations';
 import { RootState } from '@/store';
 import { MemoryRegionDump } from '@/virtual-machine/risc-v/cpu-cores/peripherals/memory';
 import { binByte } from '@/virtual-machine/utils/binary-string-formatter';
@@ -99,10 +128,11 @@ export default defineComponent({
         const line: string[] = [];
 
         const address = dump.regionInfo.startAddress + row;
-        line.push(address.toString(16).padStart(4, '0'));
+        line.push(address.toString(16).padStart(8, '0'));
+
         for (let col = 0; col < 4; col++) {
-          const value = rbDv.getUint32(row, true);
-          line.push(value.toString(16).padStart(8, '0'));
+          const value = rbDv.getUint8(row + col);
+          line.push(value.toString(16).padStart(2, '0'));
         }
 
         addrLines.push(line);
@@ -152,23 +182,27 @@ export default defineComponent({
       for (let i = 0; i < 32; i++) {
         formattedReg.push([
           `x${i.toString()}`,
-          store.state.cpuState.registers[i].toString(16).padEnd(8, '0')
+          store.state.cpuState.registers[i].toString(16).padStart(8, '0')
         ])
       }
 
       return formattedReg;
     });
 
+    const programCounter = computed(() => store.state.programCounter);
+
 
     return {
       reset: () => store.commit(RESET_VM),
       step: () => store.commit(STEP_VM),
+      next: () => store.commit(NEXT_VM),
       programLoaded,
       vmHalted,
       programDump,
       ramDump,
       cpuState,
-      registerDump
+      registerDump,
+      programCounter
     }
   }
 });
@@ -200,12 +234,15 @@ export default defineComponent({
       border-right: 2px solid var(--mk-yellow-trans);
       border-bottom: 2px solid var(--mk-yellow-trans);
       border-radius: 5px;
+      display: flex;
+      flex-direction: column;
 
       .header {
         display: flex;
         margin-bottom: 10px;
         justify-content: center;
-        font-family: "Orbitron", sans-serif;
+        align-items: center;
+        font-family: 'Roboto Mono', monospace;
         font-weight: 700;
         text-transform: uppercase;
       }
@@ -213,11 +250,64 @@ export default defineComponent({
       .addr-line {
         display: flex;
         font-family: 'Roboto Mono', monospace;
+        box-sizing: border-box;
+
+        &.current-line {
+          padding: 0;
+          border: 1px solid var(--mk-yellow);
+        }
+
+        &.other-line {
+          padding: 1px;
+        }
+
         .addr-start {
           padding-right: 5px;
-          margin-right: 5px;
+          margin-right: 15px;
           margin-left: 5px;
           border-right: 1px solid var(--mk-yellow-trans);
+        }
+
+        .addr-value-line {
+          display: flex;
+
+          .addr-value {
+            margin-right: 10px;
+          }
+        }
+      }
+
+      .state-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+
+        .state-group {
+          margin: 2px;
+        }
+
+        .state-header {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-family: 'Roboto Mono', monospace;
+          font-weight: 700;
+          text-transform: uppercase;
+          background: var(--mk-green);
+          height: 2rem;
+        }
+
+        .state-content {
+          border: 1px solid var(--mk-green);
+          background: var(--background-color);
+          font-family: 'Roboto Mono', monospace;
+        }
+
+        .program-counter {
+          display: flex;
+          justify-content: center;
+          align-items: center;
         }
       }
     }

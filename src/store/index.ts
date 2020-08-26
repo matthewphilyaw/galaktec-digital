@@ -5,7 +5,7 @@ import { CoreState } from '@/virtual-machine/risc-v/cpu-cores/proto-core';
 import {
   LOAD_PROGRAM,
   RESET_VM,
-  STEP_VM
+  STEP_VM, NEXT_VM
 } from './mutations';
 
 import { VM } from '@/virtual-machine/vm';
@@ -62,6 +62,23 @@ export const store = createStore<RootState>({
     [STEP_VM](state: RootState) {
       try {
         vm.tick();
+      }
+      catch (error) {
+        console.log(error);
+        state.vmHalted = true;
+      }
+      updateStateFromVM(vm, state);
+    },
+    [NEXT_VM](state: RootState) {
+      try {
+        // Either mid execution of pipeline
+        // or on the initial state.
+        // Lets pump the clock once and run till next fetch
+        do {
+          vm.tick();
+        } while (vm.getCoreState().pipelineState !== 'fetch');
+
+        updateStateFromVM(vm, state);
       }
       catch (error) {
         console.log(error);
