@@ -56,15 +56,10 @@ export class ProtoCore {
   loadProgram(programBuffer: ArrayBuffer): void {
     const dv = new DataView(programBuffer);
 
-    this.memoryController.writeWord(0x00, 0);
-    this.memoryController.writeWord(0x04, 10);
-
     for (let address = 0; address < programBuffer.byteLength; address++) {
       const byte = dv.getUint8(address);
-      this.memoryController.writeByte(address + 8, byte);
+      this.memoryController.writeByte(address, byte);
     }
-
-    this.pc = 8;
   }
 
   getState(): CoreState {

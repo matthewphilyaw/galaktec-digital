@@ -34,7 +34,6 @@ export class VM {
     this.core = new ProtoCore(protoMemoryLayout);
 
     this.core.loadProgram(ctx.programMemoryBuffer);
-    this.core.memoryController.dumpMemories(4);
   }
 
   getRam(): MemoryRegionDump {

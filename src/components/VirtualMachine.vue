@@ -27,7 +27,8 @@
       <div class="header">
         <div v-if="ramDump">{{ `${ramDump.regionInfo.regionName} | ${ramDump.regionInfo.lengthInBytes} (bytes)` }}</div>
       </div>
-      <div class="addr-container">
+      <div class="addr-container"
+           v-if="ramDump">
         <div v-if="ramDump"
              v-for="row in ramDump.formattedLines"
              class="addr-line">
@@ -54,12 +55,76 @@
     <div class="stats-container">
       <div class="header">CPU STATE</div>
       <div class="state-container">
-        <div class="state-group">
+        <div class="state-group program-counter-color">
           <div class="state-header">
             Program Counter (PC)
           </div>
           <div class="state-content program-counter">
             {{ programCounter.toString(16).padStart(8, '0') }}
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
+            Pipeline Stage
+          </div>
+          <div class="state-content pipeline-container">
+            <div class="stage"
+                 :class="{ active: cpuState && cpuState.pipelineState === 'fetch' }">
+              FE
+            </div>
+            <div class="stage"
+              :class="{ active: cpuState && cpuState.pipelineState === 'decode' }">
+              DE
+            </div>
+            <div class="stage"
+                :class="{ active: cpuState && cpuState.pipelineState === 'execute' }">
+              EX
+            </div>
+            <div class="stage"
+                 :class="{ active: cpuState && cpuState.pipelineState === 'memory-access' }">
+              MEM
+            </div>
+            <div class="stage"
+                 :class="{ active: cpuState && cpuState.pipelineState === 'write-back' }">
+              WB
+            </div>
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
+            Fetched Instruction
+          </div>
+          <div class="state-content program-counter">
+            {{ cpuState ? cpuState.fetchedInstruction.toString(16).padEnd(8, '0') : 'N/A' }}
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
+            Decoded Result
+          </div>
+          <div class="state-content cpu-state">
+            <div class="pull-right">instr fmt</div><div>{{cpuState ? cpuState.decodedInstruction?.instructionFormat : '' }}</div>
+            <div class="pull-right">full Opcode</div><div>{{cpuState ? cpuState.decodedInstruction?.fullOpcode.toString(2) : '' }}</div>
+            <div class="pull-right">dest reg</div><div>{{cpuState ? cpuState.decodedInstruction?.destinationRegisterIndex : '' }}</div>
+            <div class="pull-right">first reg</div><div>{{cpuState ? cpuState.decodedInstruction?.firstRegisterValue.toString(16).padStart(8, '0') : '' }}</div>
+            <div class="pull-right">second reg</div><div>{{cpuState ? cpuState.decodedInstruction?.secondRegisterValue.toString(16).padStart(8, '0') : '' }}</div>
+            <div class="pull-right">immediate</div><div>{{cpuState ? cpuState.decodedInstruction?.immediate.toString(16).padStart(8,'0') : '' }}</div>
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
+            Execute Result
+          </div>
+          <div class="state-content program-counter">
+            {{ cpuState ? cpuState.ALUResult.toString(16).padEnd(8, '0') : 'N/A' }}
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
+            Memory Access Result
+          </div>
+          <div class="state-content program-counter">
+            {{ cpuState ? cpuState.memoryAccessResult.toString(16).padEnd(8, '0') : 'N/A' }}
           </div>
         </div>
       </div>
@@ -79,16 +144,16 @@
              v-if="!programLoaded || vmHalted" ></div>
         <button class="cmd-item x2 spacer-top"
                 v-if="programLoaded && !vmHalted"
-                @click="next()">
-          Next
+                @click="step()">
+          Step
         </button>
         <div class="fill x1 spacer-top"></div>
         <div class="fill x2 spacer-top"
              v-if="!programLoaded || vmHalted" ></div>
         <button class="cmd-item x2 spacer-top"
                 v-if="programLoaded && !vmHalted"
-                @click="step()">
-          Step
+                @click="next()">
+          Next
         </button>
         <div class="fill xf spacer-top"></div>
       </div>
@@ -101,12 +166,11 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue';
-import { useStore, mapState } from 'vuex';
+import { useStore } from 'vuex';
 import Knife from '../components/theme/Knife.vue';
 import { RESET_VM, STEP_VM, NEXT_VM } from '@/store/mutations';
 import { RootState } from '@/store';
 import { MemoryRegionDump } from '@/virtual-machine/risc-v/cpu-cores/peripherals/memory';
-import { binByte } from '@/virtual-machine/utils/binary-string-formatter';
 
 export default defineComponent({
   name: 'VirtualMachine' ,
@@ -153,7 +217,7 @@ export default defineComponent({
       return {
         regionInfo,
         formattedLines: formatMemoryDump(store.state.programDump)
-      }
+      };
     });
     const ramDump = computed(() => {
       if (!store.state.ramDump) {
@@ -165,25 +229,22 @@ export default defineComponent({
       return {
         regionInfo,
         formattedLines: formatMemoryDump(store.state.ramDump)
-      }
+      };
     });
 
     const cpuState = computed(() => store.state.cpuState);
     const registerDump = computed(() => {
       const formattedReg: string[][] = [];
-      const registerDump = store.state.registerDump;
 
       if (!store.state.cpuState) {
         return formattedReg;
       }
 
-      console.log('running mem');
-
       for (let i = 0; i < 32; i++) {
         formattedReg.push([
           `x${i.toString()}`,
           store.state.cpuState.registers[i].toString(16).padStart(8, '0')
-        ])
+        ]);
       }
 
       return formattedReg;
@@ -294,14 +355,56 @@ export default defineComponent({
           font-family: 'Roboto Mono', monospace;
           font-weight: 700;
           text-transform: uppercase;
-          background: var(--mk-green);
           height: 2rem;
+          background: var(--header-color);
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
         }
 
         .state-content {
-          border: 1px solid var(--mk-green);
-          background: var(--background-color);
           font-family: 'Roboto Mono', monospace;
+          border: 1px solid var(--border-color);
+          border-bottom-left-radius: 5px;
+          border-bottom-right-radius: 5px;
+        }
+
+        .cpu-state {
+          display: grid;
+          grid-template-columns: 125px auto;
+        }
+
+        .pull-right {
+          display: flex;
+          justify-content: flex-end;
+          padding-right: 10px;
+        }
+
+        .pipeline-container {
+          display: flex;
+          justify-content: space-evenly;
+
+          .stage {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 1px 1.5px;
+            width: 100%;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+          }
+
+          .active {
+            background: var(--mk-pink);
+          }
+
+          .inactive {
+            background: var(--mk-green);
+          }
+        }
+
+        .program-counter-color {
+          --header-color: var(--mk-blue);
+          --border-color: var(--mk-blue);
         }
 
         .program-counter {
