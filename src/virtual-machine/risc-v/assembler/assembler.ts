@@ -60,6 +60,7 @@ export function assemble(program: string, targetMemSize: number): AssemblerConte
       if (assembled instanceof AssemblerError) {
         throw assembled;
       } else if (assembled instanceof AssembledInstruction) {
+
         ctx.programMap[pc] = new AssemblerLineContext(
           statement,
           assembled
