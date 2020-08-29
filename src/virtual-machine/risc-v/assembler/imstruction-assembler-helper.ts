@@ -1,9 +1,9 @@
 import {
-  buildBType,
-  buildIType,
-  buildJType, buildRType, buildSType,
-  buildUType,
-} from './risc-v-instruction-builders';
+  encodeBType,
+  encodeIType,
+  encodeJType, encodeRType, encodeSType,
+  encodeUType,
+} from './instruction-type-encoder';
 
 export enum Instruction {
   'LUI' = 0b0110111,
@@ -200,152 +200,152 @@ export function validInstruction(instruction: string): boolean {
 
 
 export function LUI(rd: string, imm: number): number {
-  return buildUType(Instruction.LUI, REGISTER_MAP[rd], imm);
+  return encodeUType(Instruction.LUI, REGISTER_MAP[rd], imm);
 }
 
 export function AUIPC(rd: string, imm: number): number {
-  return buildUType(Instruction.AUIPC, REGISTER_MAP[rd], imm);
+  return encodeUType(Instruction.AUIPC, REGISTER_MAP[rd], imm);
 }
 
 export function JAL(rd: string, imm: number): number {
-  return buildJType(Instruction.JAL, REGISTER_MAP[rd], imm);
+  return encodeJType(Instruction.JAL, REGISTER_MAP[rd], imm);
 }
 
 export function JALR(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.JALR, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
+  return encodeIType(Instruction.JALR, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
 }
 
 export function BEQ(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BEQ, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b000);
+  return encodeBType(Instruction.BEQ, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b000);
 }
 
 export function BNE(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BNE, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b001);
+  return encodeBType(Instruction.BNE, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b001);
 }
 
 export function BLT(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BLT, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b100);
+  return encodeBType(Instruction.BLT, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b100);
 }
 
 export function BGE(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BGE, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b101);
+  return encodeBType(Instruction.BGE, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b101);
 }
 
 export function BLTU(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BLTU, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b110);
+  return encodeBType(Instruction.BLTU, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b110);
 }
 
 export function BGEU(rs1: string, rs2: string, imm: number): number {
-  return buildBType(Instruction.BGEU, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b111);
+  return encodeBType(Instruction.BGEU, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b111);
 }
 
 export function LB(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.LB, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
+  return encodeIType(Instruction.LB, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
 }
 
 export function LH(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.LH, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b001);
+  return encodeIType(Instruction.LH, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b001);
 }
 
 export function LW(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.LW, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b010);
+  return encodeIType(Instruction.LW, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b010);
 }
 
 export function LBU(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.LBU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b100);
+  return encodeIType(Instruction.LBU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b100);
 }
 
 export function LHU(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.LHU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
+  return encodeIType(Instruction.LHU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
 }
 
 export function SB(rs1: string, rs2: string, imm: number): number {
-  return buildSType(Instruction.SB, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b000);
+  return encodeSType(Instruction.SB, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b000);
 }
 
 export function SH(rs1: string, rs2: string, imm: number): number {
-  return buildSType(Instruction.SH, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b001);
+  return encodeSType(Instruction.SH, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b001);
 }
 
 export function SW(rs1: string, rs2: string, imm: number): number {
-  return buildSType(Instruction.SW, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b010);
+  return encodeSType(Instruction.SW, REGISTER_MAP[rs1], REGISTER_MAP[rs2], imm, 0b010);
 }
 
 export function ADDI(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.ADDI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
+  return encodeIType(Instruction.ADDI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b000);
 }
 
 export function SLTI(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.SLTI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b010);
+  return encodeIType(Instruction.SLTI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b010);
 }
 
 export function SLTIU(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.SLTIU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b011);
+  return encodeIType(Instruction.SLTIU, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b011);
 }
 
 export function XORI(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.XORI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b100);
+  return encodeIType(Instruction.XORI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b100);
 }
 
 export function ORI(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.ORI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b110);
+  return encodeIType(Instruction.ORI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b110);
 }
 
 export function ANDI(rd: string, rs1: string, imm: number): number {
-  return buildIType(Instruction.ANDI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b111);
+  return encodeIType(Instruction.ANDI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b111);
 }
 
 export function SLLI(rd: string, rs1: string, shiftAmount: number): number {
   const imm =  (shiftAmount & 0x1f);
-  return buildIType(Instruction.SLLI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b001);
+  return encodeIType(Instruction.SLLI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b001);
 }
 
 export function SRLI(rd: string, rs1: string, shiftAmount: number): number {
   const imm =  (shiftAmount & 0x1f);
-  return buildIType(Instruction.SRLI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
+  return encodeIType(Instruction.SRLI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
 }
 
 export function SRAI(rd: string, rs1: string, shiftAmount: number): number {
   const imm =  (0x400) | (shiftAmount & 0x1f); // 010000XXXXX where XXXXX is the shift amount
-  return buildIType(Instruction.SRAI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
+  return encodeIType(Instruction.SRAI, REGISTER_MAP[rd], REGISTER_MAP[rs1], imm, 0b101);
 }
 
 export function ADD(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.ADD, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b000, 0b0000000);
+  return encodeRType(Instruction.ADD, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b000, 0b0000000);
 }
 
 export function SUB(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SUB, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b000, 0b0100000);
+  return encodeRType(Instruction.SUB, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b000, 0b0100000);
 }
 
 export function SLL(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SLL, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b001, 0b0000000);
+  return encodeRType(Instruction.SLL, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b001, 0b0000000);
 }
 
 export function SLT(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SLT, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b010, 0b0000000);
+  return encodeRType(Instruction.SLT, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b010, 0b0000000);
 }
 
 export function SLTU(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SLTU, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b011, 0b0000000);
+  return encodeRType(Instruction.SLTU, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b011, 0b0000000);
 }
 
 export function XOR(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.XOR, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b100, 0b0000000);
+  return encodeRType(Instruction.XOR, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b100, 0b0000000);
 }
 
 export function SRL(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SRL, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b101, 0b0000000);
+  return encodeRType(Instruction.SRL, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b101, 0b0000000);
 }
 
 export function SRA(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b101, 0b0100000);
+  return encodeRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b101, 0b0100000);
 }
 
 export function OR(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b110, 0b0000000);
+  return encodeRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b110, 0b0000000);
 }
 
 export function AND(rd: string, rs1: string, rs2: string): number {
-  return buildRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b111, 0b0000000);
+  return encodeRType(Instruction.SRA, REGISTER_MAP[rd], REGISTER_MAP[rs1], REGISTER_MAP[rs2], 0b111, 0b0000000);
 }

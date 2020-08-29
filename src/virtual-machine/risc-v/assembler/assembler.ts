@@ -1,5 +1,5 @@
 import * as astat from '../../grammar/assembly-statements';
-import * as ainst from '../assembler/assembly-instruction-handlers';
+import * as ainst from '../assembler/instruction-assembler';
 
 import riscVGrammar from '../../grammar/risc-v-grammar';
 

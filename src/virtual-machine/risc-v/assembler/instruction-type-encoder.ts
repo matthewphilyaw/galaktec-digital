@@ -37,24 +37,24 @@ function immUType(imm: number): number {
   return ((imm >>> 0) & IMM_U20) << 12;
 }
 
-export function buildRType(oc: number, regD: number, regS1: number, regS2: number, f3: number, f7: number): number {
+export function encodeRType(oc: number, regD: number, regS1: number, regS2: number, f3: number, f7: number): number {
   const instr = func7(f7) | rs2(regS2) | rs1(regS1) | func3(f3) | rd(regD) | opcode(oc);
   return instr;
 }
 
-export function buildIType(oc: number, regD: number, regS1: number, imm: number, f3: number): number {
+export function encodeIType(oc: number, regD: number, regS1: number, imm: number, f3: number): number {
   const instr = immIType(imm) | rs1(regS1) | func3(f3) | rd(regD) | opcode(oc);
   return instr;
 }
 
-export function buildSType(oc: number, regS1: number, regS2: number, imm: number, f3: number): number {
+export function encodeSType(oc: number, regS1: number, regS2: number, imm: number, f3: number): number {
   // Pass upper 7 bits of imm into func7 slot
   // and lower 5 bits of imm into rd
   const instr = func7(((imm >>> 0) >>> 5)) | rs2(regS2) | rs1(regS1) | func3(f3) | rd(imm) | opcode(oc);
   return instr;
 }
 
-export function buildBType(oc: number, regS1: number, regS2: number, imm: number, f3: number): number {
+export function encodeBType(oc: number, regS1: number, regS2: number, imm: number, f3: number): number {
   imm = (imm >>> 0);
 
   const immBit12    = (imm >>> 11) & 0x1;
@@ -71,12 +71,12 @@ export function buildBType(oc: number, regS1: number, regS2: number, imm: number
   return instr;
 }
 
-export function buildUType(oc: number, regD: number, imm: number): number {
+export function encodeUType(oc: number, regD: number, imm: number): number {
   const instr = immUType(imm) | rd(regD) | opcode(oc);
   return instr;
 }
 
-export function buildJType(oc: number, regD: number, imm: number): number {
+export function encodeJType(oc: number, regD: number, imm: number): number {
   imm = (imm >>> 0); // coercing to unsigned
 
   const immBit20       = (imm >>> 19) & 0x1;

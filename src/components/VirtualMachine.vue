@@ -52,7 +52,7 @@
       </div>
     </div>
     <div class="stats-container">
-      <div class="header">CPU STATE</div>
+      <div class="header">CPU Status</div>
       <div class="state-container">
         <div class="state-group">
           <div class="state-header">

@@ -1,10 +1,10 @@
 import * as astat from '../../grammar/assembly-statements';
-import * as instrHelpers from '../instructions/risc-v-instruction-helpers';
+import * as instrHelpers from './imstruction-assembler-helper';
 import {binWord, Chunk} from '../../utils/binary-string-formatter';
-import {I_TYPE_PATTERN, R_TYPE_PATTERN, S_TYPE_PATTERN} from '../instructions/risc-v-instruction-builders';
+import {I_TYPE_PATTERN, R_TYPE_PATTERN, S_TYPE_PATTERN} from './instruction-type-encoder';
 import {Token} from 'moo';
 import {Offset, PseudoRelocation} from '../../grammar/assembly-statements';
-import {REGISTERS} from '../instructions/risc-v-instruction-helpers';
+import {REGISTERS} from './imstruction-assembler-helper';
 import {AssembledInstruction, AssemblerError} from './assembler';
 
 export interface InstructionAssembler {
