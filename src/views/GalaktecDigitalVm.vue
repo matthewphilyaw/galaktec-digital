@@ -149,6 +149,7 @@ export default defineComponent({
       });
 
       codeMirror.setValue(sampleProgram);
+      store.commit(LOAD_PROGRAM, sampleProgram);
     });
 
     function loadProgram() {
