@@ -4,7 +4,15 @@ import { Token } from 'moo';
 import {
   encodeIType,
   I_TYPE_PATTERN,
-  R_TYPE_PATTERN, encodeRType, S_TYPE_PATTERN, encodeSType, encodeUType, U_TYPE_PATTERN
+  R_TYPE_PATTERN,
+  encodeRType,
+  S_TYPE_PATTERN,
+  encodeSType,
+  encodeUType,
+  U_TYPE_PATTERN,
+  encodeJType,
+  J_TYPE_PATTERN,
+  encodeBType, B_TYPE_PATTERN
 } from '@/virtual-machine/risc-v/assembler/instruction-type-encoder';
 import { AssembledInstruction, AssemblerError } from '@/virtual-machine/risc-v/assembler/assembler';
 import { REGISTER_MAP } from '@/virtual-machine/risc-v/assembler/resgisters';
@@ -108,6 +116,27 @@ export class UTypeAssembler extends InstructionAssembler {
   }
 }
 
+export class JTypeAssembler extends InstructionAssembler {
+  assemble(instruction: Instruction): AssembledInstruction {
+    if (!instruction.argTokens) {
+      throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
+    }
+
+    const rd = instruction.argTokens[0] as Token;
+    const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
+
+    const formattedInstruction = formatInstruction(instruction);
+    const word = encodeJType(
+      this.opcode,
+      REGISTER_MAP[rd.value],
+      imm
+    );
+    const formatted = binWord(word, Chunk.CUSTOM, J_TYPE_PATTERN);
+
+    return new AssembledInstruction(word, formatted, formattedInstruction);
+  }
+}
+
 export class RTypeAssembler extends InstructionAssembler {
   assemble(instruction: Instruction): AssembledInstruction {
     if (!instruction.argTokens) {
@@ -125,8 +154,34 @@ export class RTypeAssembler extends InstructionAssembler {
       REGISTER_MAP[rs1],
       REGISTER_MAP[rs2],
       this.f3!,
-      this.f7 ?? 0);
+      this.f7 ?? 0
+    );
     const formatted = binWord(word, Chunk.CUSTOM, R_TYPE_PATTERN);
+
+    return new AssembledInstruction(word, formatted, formattedInstruction);
+  }
+}
+
+export class BTypeAssembler extends InstructionAssembler {
+  assemble(instruction: Instruction): AssembledInstruction {
+    if (!instruction.argTokens) {
+      throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
+    }
+
+    const rs1 = (instruction.argTokens[0] as Token).value;
+    const rs2 = (instruction.argTokens[1] as Token).value;
+    const imm = (((instruction.argTokens[2] as Token).value) as unknown) as number;
+
+
+    const formattedInstruction = formatInstruction(instruction);
+    const word = encodeBType(
+      this.opcode,
+      REGISTER_MAP[rs1],
+      REGISTER_MAP[rs2],
+      imm,
+      this.f3!
+    );
+    const formatted = binWord(word, Chunk.CUSTOM, B_TYPE_PATTERN);
 
     return new AssembledInstruction(word, formatted, formattedInstruction);
   }
@@ -135,32 +190,14 @@ export class RTypeAssembler extends InstructionAssembler {
 export const instructionAssemblerLookup: Record<string, InstructionAssembler> = {
   'LUI': new UTypeAssembler(0b0110111),
   'AUIPC': new UTypeAssembler(0b0010111),
-  /*
-  'JAL': {
-    opcode: 0b1101111,
-  },
-  'JALR': {
-    opcode: 0b1100111,
-  },
-  'BEQ': {
-    opcode: 0b1100011,
-  },
-  'BNE': {
-    opcode: 0b1100011,
-  },
-  'BLT': {
-    opcode: 0b1100011,
-  },
-  'BGE': {
-    opcode: 0b1100011,
-  },
-  'BLTU': {
-    opcode: 0b1100011,
-  },
-  'BGEU': {
-    opcode: 0b1100011,
-  },
- */
+  'JAL': new JTypeAssembler(0b1101111),
+  'JALR': new ITypeAssembler(0b1100111),
+  'BEQ': new BTypeAssembler(0b1100011, 0b000),
+  'BNE': new BTypeAssembler(0b1100011, 0b001),
+  'BLT': new BTypeAssembler(0b1100011, 0b100),
+  'BGE': new BTypeAssembler(0b1100011, 0b101),
+  'BLTU': new BTypeAssembler(0b1100011, 0b110),
+  'BGEU': new BTypeAssembler(0b1100011, 0b111),
   'LB': new ITypeAssembler(0b0000011, 0b000),
   'LH': new ITypeAssembler(0b0000011, 0b001),
   'LW': new ITypeAssembler(0b0000011, 0b010),
