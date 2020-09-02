@@ -2,21 +2,27 @@ import * as astat from '@/virtual-machine/grammar/assembly-statements';
 import { Instruction, PseudoRelocation, Offset } from '@/virtual-machine/grammar/assembly-statements';
 import { Token } from 'moo';
 import {
-  encodeIType,
   I_TYPE_PATTERN,
   R_TYPE_PATTERN,
-  encodeRType,
   S_TYPE_PATTERN,
+  U_TYPE_PATTERN,
+  J_TYPE_PATTERN,
+  B_TYPE_PATTERN,
+  encodeRType,
+  encodeIType,
   encodeSType,
   encodeUType,
-  U_TYPE_PATTERN,
   encodeJType,
-  J_TYPE_PATTERN,
-  encodeBType, B_TYPE_PATTERN
+  encodeBType,
 } from '@/virtual-machine/risc-v/assembler/instruction-type-encoder';
 import { AssembledInstruction, AssemblerError } from '@/virtual-machine/risc-v/assembler/assembler';
 import { REGISTER_MAP } from '@/virtual-machine/risc-v/assembler/resgisters';
 import { binWord, Chunk } from '@/virtual-machine/utils/binary-string-formatter';
+import {
+  IntermediateInstruction,
+  ITypeIntermediate, RTypeIntermediate,
+  SBTypeIntermediate, UJTypeIntermediate
+} from "@/virtual-machine/risc-v/assembler/intermediate-types";
 
 export abstract class InstructionAssembler {
   protected opcode: number;
@@ -29,11 +35,11 @@ export abstract class InstructionAssembler {
     this.f7 = f7;
   }
 
-  abstract assemble(instruction: Instruction): AssembledInstruction
+  abstract assemble(instruction: Instruction): IntermediateInstruction
 }
 
 export class ITypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -58,45 +64,41 @@ export class ITypeAssembler extends InstructionAssembler {
       imm |= (this.f7 << 5);
     }
 
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeIType(
-      this.opcode,
-      REGISTER_MAP[rd],
-      REGISTER_MAP[rs1],
-      imm,
-      this.f3!
+    return new ITypeIntermediate(
+        REGISTER_MAP[rd],
+        REGISTER_MAP[rs1],
+        imm,
+        this.opcode,
+        instruction,
+        this.f3
     );
-    const formattedWord = binWord(word, Chunk.CUSTOM, I_TYPE_PATTERN);
-
-    return new AssembledInstruction(word, formattedWord, formattedInstruction);
   }
 }
 
 export class STypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
 
     const rd = instruction.argTokens[0] as Token;
     const offset = instruction.argTokens[1] as astat.Offset;
+    const immediate = (offset.offset.value as unknown) as number;
 
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeSType(
-      this.opcode,
+    return new SBTypeIntermediate(
+      true,
       REGISTER_MAP[offset.base.value],
       REGISTER_MAP[rd.value],
-      (offset.offset.value as unknown) as number,
-      this.f3!,
+      immediate,
+      this.opcode,
+      instruction,
+      this.f3,
     );
-    const formatted = binWord(word, Chunk.CUSTOM, S_TYPE_PATTERN);
-
-    return new AssembledInstruction(word, formatted, formattedInstruction);
   }
 }
 
 export class UTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -110,14 +112,19 @@ export class UTypeAssembler extends InstructionAssembler {
       REGISTER_MAP[rd.value],
       imm
     );
-    const formatted = binWord(word, Chunk.CUSTOM, U_TYPE_PATTERN);
 
-    return new AssembledInstruction(word, formatted, formattedInstruction);
+    return new UJTypeIntermediate(
+      true,
+      REGISTER_MAP[rd.value],
+      imm,
+      this.opcode,
+      instruction
+    );
   }
 }
 
 export class JTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -125,20 +132,18 @@ export class JTypeAssembler extends InstructionAssembler {
     const rd = instruction.argTokens[0] as Token;
     const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
 
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeJType(
-      this.opcode,
+    return new UJTypeIntermediate(
+      false,
       REGISTER_MAP[rd.value],
-      imm
+      imm,
+      this.opcode,
+      instruction
     );
-    const formatted = binWord(word, Chunk.CUSTOM, J_TYPE_PATTERN);
-
-    return new AssembledInstruction(word, formatted, formattedInstruction);
   }
 }
 
 export class RTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -147,23 +152,20 @@ export class RTypeAssembler extends InstructionAssembler {
     const rs1 = (instruction.argTokens[1] as Token).value;
     const rs2 = (instruction.argTokens[2] as Token).value;
 
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeRType(
-      this.opcode,
+    return new RTypeIntermediate(
       REGISTER_MAP[rd],
       REGISTER_MAP[rs1],
       REGISTER_MAP[rs2],
-      this.f3!,
-      this.f7 ?? 0
+      this.opcode,
+      instruction,
+      this.f3,
+      this.f7
     );
-    const formatted = binWord(word, Chunk.CUSTOM, R_TYPE_PATTERN);
-
-    return new AssembledInstruction(word, formatted, formattedInstruction);
   }
 }
 
 export class BTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): AssembledInstruction {
+  assemble(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -172,18 +174,15 @@ export class BTypeAssembler extends InstructionAssembler {
     const rs2 = (instruction.argTokens[1] as Token).value;
     const imm = (((instruction.argTokens[2] as Token).value) as unknown) as number;
 
-
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeBType(
-      this.opcode,
+    return new SBTypeIntermediate(
+      false,
       REGISTER_MAP[rs1],
       REGISTER_MAP[rs2],
       imm,
+      this.opcode,
+      instruction,
       this.f3!
     );
-    const formatted = binWord(word, Chunk.CUSTOM, B_TYPE_PATTERN);
-
-    return new AssembledInstruction(word, formatted, formattedInstruction);
   }
 }
 
@@ -258,7 +257,7 @@ function formatInstruction(instruction: astat.Instruction): string {
   return `opcode: ${instruction.opcodeToken.value} ${argList}`;
 }
 
-export function assembleStatement(instruction: astat.Instruction): AssembledInstruction | AssemblerError {
+export function assembleStatement(instruction: astat.Instruction): IntermediateInstruction | AssemblerError {
   const instrAssembler = instructionAssemblerLookup[instruction.opcodeToken.value.toUpperCase()];
 
   if (!instrAssembler) {

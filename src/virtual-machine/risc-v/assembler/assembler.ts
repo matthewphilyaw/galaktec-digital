@@ -4,6 +4,7 @@ import * as ainst from '../assembler/instruction-assembler';
 import riscVGrammar from '../../grammar/risc-v-grammar';
 
 import { Grammar, Parser } from 'nearley';
+import {IntermediateInstruction} from "@/virtual-machine/risc-v/assembler/intermediate-types";
 
 export class AssemblerError {
   constructor(
@@ -24,7 +25,7 @@ export class AssembledInstruction {
 export class AssemblerLineContext {
   constructor(
     public assemblyStatement: astat.AssemblyStatement,
-    public assembledStatement: AssembledInstruction
+    public assembledStatement: IntermediateInstruction
   ) {}
 
 }
@@ -59,15 +60,17 @@ export function assemble(program: string, targetMemSize: number): AssemblerConte
 
       if (assembled instanceof AssemblerError) {
         throw assembled;
-      } else if (assembled instanceof AssembledInstruction) {
+      } else if (assembled instanceof IntermediateInstruction) {
 
         ctx.programMap[pc] = new AssemblerLineContext(
           statement,
           assembled
         );
 
-        programMemory.setUint32(pc, assembled.encodedInstruction, true);
-        pc += 4;
+        for (const encoded of assembled.encodedInstructions) {
+          programMemory.setUint32(pc, encoded, true);
+          pc += 4;
+        }
       } else {
         throw new Error('Invalid state.');
       }
