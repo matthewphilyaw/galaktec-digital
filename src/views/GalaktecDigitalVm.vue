@@ -41,6 +41,12 @@
   </div>
 </template>
 
+<style lang="scss">
+.highlight {
+  border: 1px solid var(--mk-yellow);
+}
+</style>
+
 <style lang="scss" scoped>
   .handle-no-rad {
     --ux-bar-handle-end-cap-rad-top: 0px;
@@ -118,6 +124,8 @@
 <script lang="ts">
 
 
+import { RootState } from '@/store';
+
 declare const CodeMirror: any;
 
 import { defineComponent, ref, onMounted } from 'vue';
@@ -156,6 +164,12 @@ export default defineComponent({
       const program = codeMirror.getValue();
       store.commit(LOAD_PROGRAM, program);
     }
+
+    store.watch(function(state) { return state.currentLineNumber; }, function (newLine, oldLine) {
+      console.log('line: ', oldLine, newLine);
+      codeMirror.removeLineClass(oldLine - 1, 'background', null);
+      codeMirror.addLineClass(newLine - 1, 'background', 'highlight');
+    });
 
     return {
       editor,

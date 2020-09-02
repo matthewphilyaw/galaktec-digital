@@ -4,7 +4,8 @@ import * as ainst from '../assembler/instruction-assembler';
 import riscVGrammar from '../../grammar/risc-v-grammar';
 
 import { Grammar, Parser } from 'nearley';
-import {IntermediateInstruction} from "@/virtual-machine/risc-v/assembler/intermediate-types";
+import { IntermediateInstruction, IntermediateLabel } from '@/virtual-machine/risc-v/assembler/intermediate-types';
+import { SymbolTable } from '@/virtual-machine/risc-v/assembler/symbol-table';
 
 export class AssemblerError {
   constructor(
@@ -22,20 +23,12 @@ export class AssembledInstruction {
   ) {}
 }
 
-export class AssemblerLineContext {
-  constructor(
-    public assemblyStatement: astat.AssemblyStatement,
-    public assembledStatement: IntermediateInstruction
-  ) {}
-
-}
-
 export class AssemblerContext {
-  public programMap: Record<number, AssemblerLineContext>;
+  public programMap: Map<number, IntermediateInstruction>;
   public programMemoryBuffer: ArrayBuffer;
 
   constructor(targetMemSize: number) {
-    this.programMap = {};
+    this.programMap = new Map<number, IntermediateInstruction>();
     this.programMemoryBuffer = new ArrayBuffer(targetMemSize);
   }
 }
@@ -49,33 +42,55 @@ export function assemble(program: string, targetMemSize: number): AssemblerConte
   // AssemblerContext is just where the buffer resides.
   const programMemory = new DataView(ctx.programMemoryBuffer);
 
-  let pc = 0;
-
   parser.feed(program.toString());
   const parsedProgram = parser.results[0] as astat.AssemblyStatement[];
+  const symbolTable = new SymbolTable();
+
+  const programIntermediates = [];
 
   for (const statement of parsedProgram) {
     if (statement instanceof astat.Instruction) {
-      const assembled = ainst.assembleStatement(statement);
+      const assembled = ainst.assembleStatement(statement, symbolTable);
 
       if (assembled instanceof AssemblerError) {
         throw assembled;
       } else if (assembled instanceof IntermediateInstruction) {
-
-        ctx.programMap[pc] = new AssemblerLineContext(
-          statement,
-          assembled
-        );
-
-        for (const encoded of assembled.encodedInstructions) {
-          programMemory.setUint32(pc, encoded, true);
-          pc += 4;
-        }
+        programIntermediates.push(assembled);
       } else {
-        throw new Error('Invalid state.');
       }
-    } else {
-      throw new Error(`statement type: ${typeof statement} is not supported`);
+    } else if (statement instanceof astat.Label) {
+      const name = statement.nameToken.value;
+      symbolTable.defineLabel(name);
+
+      programIntermediates.push(new IntermediateLabel(
+        name,
+        statement
+      ));
+    }
+  }
+
+  // resolve label address against fake pc
+
+  let pc = 0;
+  for (const intermediate of programIntermediates) {
+    if (intermediate instanceof IntermediateLabel) {
+      symbolTable.setLabelAddress(intermediate.name, pc);
+      continue;
+    }
+
+    pc += 4;
+  }
+
+  symbolTable.resolveLabelsAddresses();
+
+  pc = 0;
+
+  for (const intermediate of programIntermediates.filter(p => p instanceof IntermediateInstruction) as IntermediateInstruction[]) {
+    intermediate.encode();
+    ctx.programMap.set(pc, intermediate);
+    for (const encoded of intermediate.encodedInstructions) {
+      programMemory.setUint32(pc, encoded, true);
+      pc += 4;
     }
   }
 

@@ -17,7 +17,8 @@ export interface RootState {
   ramDump?: MemoryRegionDump,
   registerDump?: number[],
   cpuState?: CoreState,
-  programCounter: number
+  programCounter: number,
+  currentLineNumber: number,
 }
 
 let vm: VM;
@@ -29,6 +30,8 @@ function updateStateFromVM(vm: VM, state: RootState): void {
   state.programDump = vm.getProgramStorage();
   state.ramDump = vm.getRam();
   state.registerDump = state.cpuState.registers;
+
+  state.currentLineNumber = vm.getCurrentIntermediateInstruction().instructionStatement.opcodeToken.line;
 
   state.programLoaded = true;
 }
@@ -43,6 +46,7 @@ export const store = createStore<RootState>({
       registerDump: undefined,
       cpuState: undefined,
       programCounter: 0,
+      currentLineNumber: 0,
     };
   },
   mutations: {

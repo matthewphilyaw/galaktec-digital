@@ -1,6 +1,7 @@
-import { assemble } from './risc-v/assembler/assembler';
+import { assemble, AssemblerContext } from './risc-v/assembler/assembler';
 import { ProtoCore, CoreState } from './risc-v/cpu-cores/proto-core';
 import { MemoryRegion, MemoryRegionDump } from './risc-v/cpu-cores/peripherals/memory';
+import { IntermediateInstruction } from '@/virtual-machine/risc-v/assembler/intermediate-types';
 
 const programMemory: MemoryRegion = {
   regionName: 'program',
@@ -31,14 +32,25 @@ const protoMemoryLayout: MemoryRegion[] = [
 export class VM {
   private program: string;
   private core: ProtoCore;
+  private assemblerCtx: AssemblerContext;
 
   constructor(program: string) {
     this.program = program;
 
-    const ctx = assemble(program, programMemory.lengthInBytes);
+    this.assemblerCtx = assemble(program, programMemory.lengthInBytes);
     this.core = new ProtoCore(protoMemoryLayout);
 
-    this.core.loadProgram(ctx.programMemoryBuffer);
+    this.core.loadProgram(this.assemblerCtx.programMemoryBuffer);
+  }
+
+  getCurrentIntermediateInstruction(): IntermediateInstruction {
+    const currentAddress = this.core.getState().programCounter;
+    const intermediate = this.assemblerCtx.programMap.get(currentAddress);
+    if (!intermediate) {
+      throw new Error(`Can't find intermeidate at address: ${currentAddress.toString(16).padStart(8, '0')}`);
+    }
+
+    return intermediate;
   }
 
   getRam(): MemoryRegionDump {

@@ -23,6 +23,7 @@ import {
   ITypeIntermediate, RTypeIntermediate,
   SBTypeIntermediate, UJTypeIntermediate
 } from "@/virtual-machine/risc-v/assembler/intermediate-types";
+import { SymbolTable } from '@/virtual-machine/risc-v/assembler/symbol-table';
 
 export abstract class InstructionAssembler {
   protected opcode: number;
@@ -35,7 +36,7 @@ export abstract class InstructionAssembler {
     this.f7 = f7;
   }
 
-  abstract assemble(instruction: Instruction): IntermediateInstruction
+  abstract assemble(instruction: Instruction, symbolTable: SymbolTable): IntermediateInstruction
 }
 
 export class ITypeAssembler extends InstructionAssembler {
@@ -106,39 +107,52 @@ export class UTypeAssembler extends InstructionAssembler {
     const rd = instruction.argTokens[0] as Token;
     const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
 
-    const formattedInstruction = formatInstruction(instruction);
-    const word = encodeUType(
-      this.opcode,
-      REGISTER_MAP[rd.value],
-      imm
-    );
-
     return new UJTypeIntermediate(
       true,
       REGISTER_MAP[rd.value],
-      imm,
       this.opcode,
-      instruction
+      instruction,
+      imm
     );
   }
 }
 
 export class JTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): IntermediateInstruction {
+  assemble(instruction: Instruction, symbolTable: SymbolTable): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
 
     const rd = instruction.argTokens[0] as Token;
-    const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
+    const immToken = instruction.argTokens[1] as Token;
 
-    return new UJTypeIntermediate(
-      false,
-      REGISTER_MAP[rd.value],
-      imm,
-      this.opcode,
-      instruction
-    );
+    let intermediate: UJTypeIntermediate;
+    if (immToken.type === 'ident') {
+      const symbol = immToken.value;
+
+      intermediate = new UJTypeIntermediate(
+        false,
+        REGISTER_MAP[rd.value],
+        this.opcode,
+        instruction,
+        0
+      );
+
+      symbolTable.onLabelAddressResolve(symbol, (addr) => {
+        intermediate.immediate = addr;
+      });
+    } else {
+      const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
+      intermediate = new UJTypeIntermediate(
+        false,
+        REGISTER_MAP[rd.value],
+        this.opcode,
+        instruction,
+        imm
+      );
+    }
+
+    return intermediate;
   }
 }
 
@@ -181,7 +195,7 @@ export class BTypeAssembler extends InstructionAssembler {
       imm,
       this.opcode,
       instruction,
-      this.f3!
+      this.f3
     );
   }
 }
@@ -257,7 +271,7 @@ function formatInstruction(instruction: astat.Instruction): string {
   return `opcode: ${instruction.opcodeToken.value} ${argList}`;
 }
 
-export function assembleStatement(instruction: astat.Instruction): IntermediateInstruction | AssemblerError {
+export function assembleStatement(instruction: astat.Instruction, symbolTable: SymbolTable): IntermediateInstruction | AssemblerError {
   const instrAssembler = instructionAssemblerLookup[instruction.opcodeToken.value.toUpperCase()];
 
   if (!instrAssembler) {
@@ -268,6 +282,6 @@ export function assembleStatement(instruction: astat.Instruction): IntermediateI
     );
   }
 
-  return instrAssembler.assemble(instruction);
+  return instrAssembler.assemble(instruction, symbolTable);
 }
 
