@@ -169,6 +169,7 @@ export default defineComponent({
       console.log('line: ', oldLine, newLine);
       codeMirror.removeLineClass(oldLine - 1, 'background', null);
       codeMirror.addLineClass(newLine - 1, 'background', 'highlight');
+      codeMirror.scrollIntoView(newLine, 60);
     });
 
     return {
