@@ -43,6 +43,8 @@ export class ProtoCore {
 
   private state: 'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
 
+  private jump: boolean;
+
   constructor(memoryController: MemoryRegion[]) {
     this.memoryController = new MemoryController(memoryController);
     this.pc = 0;
@@ -51,6 +53,8 @@ export class ProtoCore {
     this.instruction = 0;
     this.executionResult = 0;
     this.memoryAccessResult = 0;
+
+    this.jump = false;
   }
 
   loadProgram(programBuffer: ArrayBuffer): void {
@@ -75,38 +79,48 @@ export class ProtoCore {
   }
 
   tick(): void {
+    for (let n = 0; n < 10; n++) {
+      console.time('cpu test - ' + n);
+      for (let i = 0; i < 45_000_000; i++) {
+        switch (this.state) {
+          case 'fetch':
+            this.fetch();
+            this.state = 'decode';
+            break;
+          case 'decode':
+            this.decode();
+            this.state = 'execute';
+            break;
+          case 'execute':
+            this.execute();
+            this.state = 'memory-access';
+            break;
+          case 'memory-access':
+            this.accessMemory();
+            this.state = 'write-back';
+            break;
+          case 'write-back':
+            this.writeRegisters();
+            this.state = 'fetch';
 
-    switch (this.state) {
-      case 'fetch':
-        this.fetch();
-        this.state = 'decode';
-        break;
-      case 'decode':
-        this.decode();
-        this.state = 'execute';
-        break;
-      case 'execute':
-        this.execute();
-        this.state = 'memory-access';
-        break;
-      case 'memory-access':
-        this.accessMemory();
-        this.state = 'write-back';
-        break;
-      case 'write-back':
-        this.writeRegisters();
-        this.state = 'fetch';
+            this.instruction = 0;
+            this.decodedInstruction = undefined;
+            this.executionResult = 0;
+            this.memoryAccessResult = 0;
 
-        this.instruction = 0;
-        this.decodedInstruction = undefined;
-        this.executionResult = 0;
-        this.memoryAccessResult = 0;
-        this.pc += 4;
-        break;
-      default:
-        throw new Error('Invalid state');
+            if (!this.jump) {
+              this.pc += 4;
+            } else {
+              this.jump = false;
+            }
+            break;
+          default:
+            throw new Error('Invalid state');
+
+        }
+      }
+      console.timeEnd('cpu test - ' + n);
     }
-
   }
 
   fetch(): void {
@@ -165,6 +179,16 @@ export class ProtoCore {
           0
         );
         break;
+      case 0b1101111:
+        decoded = new DecodedInstruction(
+          InstructionFormat.J,
+          opcode,
+          rd,
+          0,
+          0,
+          0
+        );
+        break;
       default:
         throw Error('Opcode not recognized!');
     }
@@ -183,6 +207,10 @@ export class ProtoCore {
         break;
       case 0b0110011: // add
         this.executionResult = instruction.firstRegisterValue + instruction.secondRegisterValue;
+        break;
+      case 0b1101111:
+        this.pc = instruction.immediate;
+        this.jump = true;
         break;
       default:
         throw new Error('unknown instruction');

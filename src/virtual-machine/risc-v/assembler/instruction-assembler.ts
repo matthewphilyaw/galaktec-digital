@@ -148,7 +148,7 @@ export class JTypeAssembler extends InstructionAssembler {
         REGISTER_MAP[rd.value],
         this.opcode,
         instruction,
-        imm
+        imm >>> 1 // address to jump to is in multiples of two
       );
     }
 
