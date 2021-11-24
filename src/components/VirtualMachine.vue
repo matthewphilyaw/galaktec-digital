@@ -11,16 +11,20 @@
         <div v-if="programDump">{{ `${programDump.regionInfo.regionName} | ${programDump.regionInfo.lengthInBytes} (bytes)` }}</div>
       </div>
       <div class="addr-container">
-        <div v-if="programDump"
-             v-for="row in programDump.formattedLines"
+        <template
+            v-if="programDump">
+        <div v-for="row in programDump.formattedLines"
+             :key="row[0]"
              class="addr-line"
              :class="row[0] === programCounter.toString(16).padStart(8, '0') ? 'current-line' : 'other-line'">
           <div class="addr-start">{{ row[0] }}</div>
           <div class="addr-value-line">
             <div class="addr-value"
-                 v-for="col in row.slice(1)">{{ col }}</div>
+                 v-for="col in row.slice(1)"
+                 :key="col">{{ col }}</div>
           </div>
         </div>
+        </template>
       </div>
     </div>
     <div class="stats-container">
@@ -29,13 +33,14 @@
       </div>
       <div class="addr-container"
            v-if="ramDump">
-        <div v-if="ramDump"
-             v-for="row in ramDump.formattedLines"
+        <div v-for="row in ramDump.formattedLines"
+             :key="row[0]"
              class="addr-line">
           <div class="addr-start">{{ row[0] }}</div>
           <div class="addr-value-line">
             <div class="addr-value"
-                 v-for="col in row.slice(1)">{{ col }}</div>
+                 v-for="col in row.slice(1)"
+                 :key="col">{{ col }}</div>
           </div>
         </div>
       </div>
@@ -44,13 +49,15 @@
       <div class="header">
         <div v-if="registerDump">Registers</div>
       </div>
-      <div v-if="registerDump"
-           v-for="row in registerDump"
-           class="addr-line">
-        <div class="addr-start" v-if="row[0].length === 2">&nbsp;{{ row[0] }}</div>
-        <div class="addr-start" v-if="row[0].length === 3">{{ row[0] }}</div>
-        <div class="addr-value">{{ row[1] }}</div>
-      </div>
+      <template v-if="registerDump">
+        <div v-for="row in registerDump"
+             :key="row[0]"
+             class="addr-line">
+          <div class="addr-start" v-if="row[0].length === 2">&nbsp;{{ row[0] }}</div>
+          <div class="addr-start" v-if="row[0].length === 3">{{ row[0] }}</div>
+          <div class="addr-value">{{ row[1] }}</div>
+        </div>
+      </template>
     </div>
     <div class="stats-container">
       <div class="header">CPU Status</div>
@@ -293,8 +300,6 @@ export default defineComponent({
 
     .stats-container {
       border-right: 2px solid var(--mk-yellow-trans);
-      border-bottom: 2px solid var(--mk-yellow-trans);
-      border-radius: 5px;
       display: flex;
       flex-direction: column;
 
@@ -312,14 +317,11 @@ export default defineComponent({
         display: flex;
         font-family: 'Roboto Mono', monospace;
         box-sizing: border-box;
+        text-transform: uppercase;
+        margin-right: 2px;
 
         &.current-line {
-          padding: 0;
-          border: 1px solid var(--mk-yellow);
-        }
-
-        &.other-line {
-          padding: 1px;
+          background: var(--mk-orange);
         }
 
         .addr-start {
@@ -345,7 +347,7 @@ export default defineComponent({
         box-sizing: border-box;
 
         .state-group {
-          margin: 2px;
+          margin: 8px;
         }
 
         .state-header {
@@ -366,6 +368,7 @@ export default defineComponent({
           border: 1px solid var(--border-color);
           border-bottom-left-radius: 5px;
           border-bottom-right-radius: 5px;
+          text-transform: uppercase;
         }
 
         .cpu-state {
@@ -389,8 +392,8 @@ export default defineComponent({
             align-items: center;
             margin: 1px 1.5px;
             width: 100%;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 2px;
+            border-bottom-right-radius: 2px;
           }
 
           .active {

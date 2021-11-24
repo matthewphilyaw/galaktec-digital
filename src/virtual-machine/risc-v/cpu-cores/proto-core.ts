@@ -82,43 +82,43 @@ export class ProtoCore {
     for (let n = 0; n < 10; n++) {
       console.time('cpu test - ' + n);
       for (let i = 0; i < 45_000_000; i++) {
-        switch (this.state) {
-          case 'fetch':
-            this.fetch();
-            this.state = 'decode';
-            break;
-          case 'decode':
-            this.decode();
-            this.state = 'execute';
-            break;
-          case 'execute':
-            this.execute();
-            this.state = 'memory-access';
-            break;
-          case 'memory-access':
-            this.accessMemory();
-            this.state = 'write-back';
-            break;
-          case 'write-back':
-            this.writeRegisters();
-            this.state = 'fetch';
+    switch (this.state) {
+      case 'fetch':
+        this.fetch();
+        this.state = 'decode';
+        break;
+      case 'decode':
+        this.decode();
+        this.state = 'execute';
+        break;
+      case 'execute':
+        this.execute();
+        this.state = 'memory-access';
+        break;
+      case 'memory-access':
+        this.accessMemory();
+        this.state = 'write-back';
+        break;
+      case 'write-back':
+        this.writeRegisters();
+        this.state = 'fetch';
 
-            this.instruction = 0;
-            this.decodedInstruction = undefined;
-            this.executionResult = 0;
-            this.memoryAccessResult = 0;
+        this.instruction = 0;
+        this.decodedInstruction = undefined;
+        this.executionResult = 0;
+        this.memoryAccessResult = 0;
 
-            if (!this.jump) {
-              this.pc += 4;
-            } else {
-              this.jump = false;
-            }
-            break;
-          default:
-            throw new Error('Invalid state');
-
+        if (!this.jump) {
+          this.pc += 4;
+        } else {
+          this.jump = false;
         }
-      }
+        break;
+      default:
+        throw new Error('Invalid state');
+
+    }
+  }
       console.timeEnd('cpu test - ' + n);
     }
   }
