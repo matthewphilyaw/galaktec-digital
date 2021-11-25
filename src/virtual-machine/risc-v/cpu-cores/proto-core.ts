@@ -79,9 +79,6 @@ export class ProtoCore {
   }
 
   tick(): void {
-    for (let n = 0; n < 10; n++) {
-      console.time('cpu test - ' + n);
-      for (let i = 0; i < 45_000_000; i++) {
     switch (this.state) {
       case 'fetch':
         this.fetch();
@@ -116,10 +113,6 @@ export class ProtoCore {
         break;
       default:
         throw new Error('Invalid state');
-
-    }
-  }
-      console.timeEnd('cpu test - ' + n);
     }
   }
 
@@ -179,16 +172,26 @@ export class ProtoCore {
           0
         );
         break;
-      case 0b1101111:
+      case 0b1101111: {
+        const imm1to10 = (instruction & 0x7FE00000) >>> 21;
+        const imm11 = (instruction & 0x100000) >>> 20;
+        const imm12to19 = (instruction & 0xFF000) >>> 12;
+        const imm20 = (instruction & 0x80000000) >>> 31;
+
+        immediate = 0;
+        immediate = (imm20 << 20) | (imm12to19 << 12) | (imm11 << 11) | (imm1to10 << 1);
+        immediate = (((immediate << 12) >> 12));
+
         decoded = new DecodedInstruction(
           InstructionFormat.J,
           opcode,
           rd,
           0,
           0,
-          0
+          this.pc + immediate // jump is relative to PC
         );
         break;
+      }
       default:
         throw Error('Opcode not recognized!');
     }

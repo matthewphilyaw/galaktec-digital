@@ -182,7 +182,6 @@ export default defineComponent({
     }
 
     store.watch(function(state) { return state.currentLineNumber; }, function (newLine, oldLine) {
-      console.log('line: ', oldLine, newLine);
       codeMirror.removeLineClass(oldLine - 1, 'background', null);
       codeMirror.addLineClass(newLine - 1, 'background', 'highlight');
     });

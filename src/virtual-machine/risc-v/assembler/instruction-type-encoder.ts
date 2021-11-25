@@ -77,7 +77,12 @@ export function encodeUType(oc: number, regD: number, imm: number): number {
 }
 
 export function encodeJType(oc: number, regD: number, imm: number): number {
-  imm = (imm >>> 0); // coercing to unsigned
+
+  if (imm < 0) {
+    imm = (((imm * -1) >> 1) * -1) >>> 0;
+  } else {
+    imm = ((imm >> 1) >>> 0); // coercing to unsigned
+  }
 
   const immBit20       = (imm >>> 19) & 0x1;
   const immBit19to12   = (imm >>> 11) & 0xff;

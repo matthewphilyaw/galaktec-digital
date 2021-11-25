@@ -23,7 +23,6 @@ export const sampleProgram =
   '# and add to value loaded\n' +
   '# then store back\n' +
   'add   x3, x1, x2\n' +
-  'sw    x3, 0x84(x0)\n' +
+  'sw    x3, 0x80(x0)\n' +
   '\n' +
-  '# load value into x4\n' +
-  'lw    x4, 0x84(x0)';
+  'jal x0, -12';
