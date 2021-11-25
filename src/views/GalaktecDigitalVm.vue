@@ -43,7 +43,7 @@
 
 <style lang="scss">
 .highlight {
-  border: 1px solid var(--mk-yellow);
+  border: 1px solid var(--mk-orange);
 }
 </style>
 
@@ -65,7 +65,23 @@
     padding: 1rem;
 
     display: grid;
-    grid-template-columns: 650px auto;
+
+    @media (min-width: 1720px) {
+      grid-template-columns: 650px auto;
+    }
+    @media (max-width: 1720px) {
+      grid-template-columns: 580px auto;
+    }
+    @media (max-width: 1640px) {
+      grid-template-columns: 500px auto;
+    }
+    @media (max-width: 1580px) {
+      grid-template-columns: 450px auto;
+    }
+    @media (max-width: 1520px) {
+      grid-template-columns: 380px auto;
+    }
+
     grid-template-rows: 45px auto 40px;
 
     .editor-top {
@@ -99,9 +115,9 @@
     .app-title {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-items: center;
       font-family: 'Orbitron', sans-serif;;
+      padding-left: 7em;
 
       h1 {
         padding: 0;
@@ -166,7 +182,6 @@ export default defineComponent({
     }
 
     store.watch(function(state) { return state.currentLineNumber; }, function (newLine, oldLine) {
-      console.log('line: ', oldLine, newLine);
       codeMirror.removeLineClass(oldLine - 1, 'background', null);
       codeMirror.addLineClass(newLine - 1, 'background', 'highlight');
     });
