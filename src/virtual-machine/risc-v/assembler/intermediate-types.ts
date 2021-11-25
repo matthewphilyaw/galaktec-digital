@@ -188,7 +188,7 @@ export class UJTypeIntermediate extends IntermediateInstruction {
   }
 
   encode() {
-    if (!this.immediate) {
+    if (this.immediate === undefined) {
       throw new Error(`Immediate was not set, likely the target of a look up for a symbol`);
     }
 

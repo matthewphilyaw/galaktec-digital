@@ -46,7 +46,7 @@ body {
   margin: auto;
   padding: 0;
 
-  width: 1920px;
+  min-width: 1440px;
 
   background: var(--background-color);
   color: var(--on-background-color);

@@ -43,6 +43,8 @@ export class ProtoCore {
 
   private state: 'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
 
+  private jump: boolean;
+
   constructor(memoryController: MemoryRegion[]) {
     this.memoryController = new MemoryController(memoryController);
     this.pc = 0;
@@ -51,6 +53,8 @@ export class ProtoCore {
     this.instruction = 0;
     this.executionResult = 0;
     this.memoryAccessResult = 0;
+
+    this.jump = false;
   }
 
   loadProgram(programBuffer: ArrayBuffer): void {
@@ -75,7 +79,6 @@ export class ProtoCore {
   }
 
   tick(): void {
-
     switch (this.state) {
       case 'fetch':
         this.fetch();
@@ -101,12 +104,16 @@ export class ProtoCore {
         this.decodedInstruction = undefined;
         this.executionResult = 0;
         this.memoryAccessResult = 0;
-        this.pc += 4;
+
+        if (!this.jump) {
+          this.pc += 4;
+        } else {
+          this.jump = false;
+        }
         break;
       default:
         throw new Error('Invalid state');
     }
-
   }
 
   fetch(): void {
@@ -165,6 +172,26 @@ export class ProtoCore {
           0
         );
         break;
+      case 0b1101111: {
+        const imm1to10 = (instruction & 0x7FE00000) >>> 21;
+        const imm11 = (instruction & 0x100000) >>> 20;
+        const imm12to19 = (instruction & 0xFF000) >>> 12;
+        const imm20 = (instruction & 0x80000000) >>> 31;
+
+        immediate = 0;
+        immediate = (imm20 << 20) | (imm12to19 << 12) | (imm11 << 11) | (imm1to10 << 1);
+        immediate = (((immediate << 12) >> 12));
+
+        decoded = new DecodedInstruction(
+          InstructionFormat.J,
+          opcode,
+          rd,
+          0,
+          0,
+          this.pc + immediate // jump is relative to PC
+        );
+        break;
+      }
       default:
         throw Error('Opcode not recognized!');
     }
@@ -183,6 +210,10 @@ export class ProtoCore {
         break;
       case 0b0110011: // add
         this.executionResult = instruction.firstRegisterValue + instruction.secondRegisterValue;
+        break;
+      case 0b1101111:
+        this.pc = instruction.immediate;
+        this.jump = true;
         break;
       default:
         throw new Error('unknown instruction');
