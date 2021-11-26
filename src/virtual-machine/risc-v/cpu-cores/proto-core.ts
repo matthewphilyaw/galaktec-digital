@@ -1,4 +1,5 @@
 import {MemoryController, MemoryRegion} from './peripherals/memory';
+import { FullOpcodeConstants, OpcodeGroupsConstants } from '@/virtual-machine/risc-v/cpu-cores/opcode';
 
 enum InstructionFormat {
   R,
@@ -123,12 +124,8 @@ export class ProtoCore {
   decode(): void {
     const instruction = this.instruction;
 
-    // 0x7F
-    // 0111 1111
     const opcode = instruction & 0x7F;
     const funct3 = (instruction >>> 12) & 0x7;
-
-    // the patterns below may not be correct for all opcodes
 
     const funct7 = (instruction >>> 25) & 0x7F;
     const rd = (instruction >>> 7) & 0x1f;
@@ -139,8 +136,9 @@ export class ProtoCore {
     let immediate = 0;
 
     switch (opcode) {
-      case 0b0010011:
-      case 0b0000011:
+      case OpcodeGroupsConstants.JALR:
+      case OpcodeGroupsConstants.ALU_IMMEDIATE:
+      case OpcodeGroupsConstants.LOAD:
         immediate = (instruction >>> 20) & 0xfff;
         decoded = new DecodedInstruction(
           InstructionFormat.I,
@@ -151,7 +149,8 @@ export class ProtoCore {
           immediate
         );
         break;
-      case 0b0100011:
+      case OpcodeGroupsConstants.BRANCHING:
+      case OpcodeGroupsConstants.STORE:
         immediate = (funct7 << 5) | rd;
         decoded = new DecodedInstruction(
           InstructionFormat.S,
@@ -162,7 +161,7 @@ export class ProtoCore {
           immediate
         );
         break;
-      case 0b0110011:
+      case OpcodeGroupsConstants.ALU:
         decoded = new DecodedInstruction(
           InstructionFormat.R,
           (funct7 << 10) | (funct3 << 7) | opcode,
@@ -172,7 +171,7 @@ export class ProtoCore {
           0
         );
         break;
-      case 0b1101111: {
+      case OpcodeGroupsConstants.JAL: {
         const imm1to10 = (instruction & 0x7FE00000) >>> 21;
         const imm11 = (instruction & 0x100000) >>> 20;
         const imm12to19 = (instruction & 0xFF000) >>> 12;
@@ -188,7 +187,22 @@ export class ProtoCore {
           rd,
           0,
           0,
-          this.pc + immediate // jump is relative to PC
+          immediate // jump is relative to PC
+        );
+        break;
+      }
+      case OpcodeGroupsConstants.LUI:
+      case OpcodeGroupsConstants.AUIPC: {
+
+        immediate = instruction & 0xffff_f000;
+
+        decoded = new DecodedInstruction(
+          InstructionFormat.U,
+          opcode,
+          rd,
+          r1 === 0 ? 0 : this.registers[r1],
+          0,
+          immediate
         );
         break;
       }
@@ -203,18 +217,28 @@ export class ProtoCore {
     const instruction = this.decodedInstruction!;
 
     switch (instruction.fullOpcode) {
-      case 0b0100100011: // sw
-      case 0b0010011: // addi
-      case 0b0100000011: // lw
+      case FullOpcodeConstants.SW: // sw
+      case FullOpcodeConstants.ADDI: // addi
+      case FullOpcodeConstants.LW: // lw
         this.executionResult = instruction.firstRegisterValue + instruction.immediate;
         break;
-      case 0b0110011: // add
+      case FullOpcodeConstants.ADD: // add
         this.executionResult = instruction.firstRegisterValue + instruction.secondRegisterValue;
         break;
-      case 0b1101111:
-        this.pc = instruction.immediate;
+      case FullOpcodeConstants.SUB:
+        this.executionResult = instruction.secondRegisterValue - instruction.firstRegisterValue;
+        break;
+      case FullOpcodeConstants.JAL:
+        this.executionResult = this.pc + 4; // result is the return address PC + 4
+        this.pc = this.pc + instruction.immediate;
         this.jump = true;
         break;
+      case FullOpcodeConstants.JALR: {
+        this.executionResult = this.pc + 4; // result is the return address PC + 4
+        this.pc = (instruction.firstRegisterValue + instruction.immediate) & 0xFFFF_FFFE;
+        this.jump = true;
+        break;
+      }
       default:
         throw new Error('unknown instruction');
     }
@@ -224,18 +248,18 @@ export class ProtoCore {
   accessMemory(): void {
     const opcode = this.decodedInstruction!.fullOpcode & 0x3f;
     // If no memory operation is needed then forward the value in execution along
-    if (opcode !== 0b0000011 && opcode !== 0b0100011) {
+    if (opcode !== OpcodeGroupsConstants.LOAD && opcode !== OpcodeGroupsConstants.STORE) {
       this.memoryAccessResult = this.executionResult;
       return;
     }
 
     const address = this.executionResult;
     switch (this.decodedInstruction!.fullOpcode) {
-      case 0b0100000011:
+      case FullOpcodeConstants.LW:
         // execution result will be a memory address
         this.memoryAccessResult = this.memoryController.readWord(address);
         break;
-      case 0b0100100011:
+      case FullOpcodeConstants.SW:
         this.memoryController.writeWord(address, this.decodedInstruction!.secondRegisterValue);
         break;
       default:
@@ -252,7 +276,9 @@ export class ProtoCore {
 
     // this could be either a true value from memory or the result of an operation which was forwarded
     // along the pipeline for simplicity
-    this.registers[this.decodedInstruction!.destinationRegisterIndex] = this.memoryAccessResult;
+    if (this.decodedInstruction!.destinationRegisterIndex !== 0) {
+      this.registers[this.decodedInstruction!.destinationRegisterIndex] = this.memoryAccessResult;
+    }
   }
 
 }

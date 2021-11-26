@@ -9,20 +9,19 @@ export const sampleProgram =
   '#       meaning you must click step 5 times to get to\n' +
   '#       next instruction. \n' +
   '\n' +
-  '# load value 15 in x1\n' +
-  '# and store it first word\n' +
-  '# of ram\n' +
-  'addi  x1, x0, 15\n' +
-  'sw    x1, 0x80(x0)\n' +
+  'start:\n' +
+  'addi  x5, x0, 15\n' +
+  'sw    x5, 0x80(x0)\n'+
   '\n' +
-  '# Fetch the newley stored value\n' +
-  '# from ram\n' +
-  'lw    x2, 0x80(x0)\n' +
+  'lw x6, 0x80(x0)\n' +
+  'jal x1, add_routine\n' +
+  'jalr x0, 0(x0)\n' +
   '\n' +
-  '# Take the existing value in x1\n' +
-  '# and add to value loaded\n' +
-  '# then store back\n' +
-  'add   x3, x1, x2\n' +
-  'sw    x3, 0x80(x0)\n' +
+  'store:\n' +
+  '    sw x7, 0x80(x0)\n' +
+  '    jalr x0, 0(x2)\n' +
   '\n' +
-  'jal x0, -12';
+  'add_routine:\n' +
+  '    add x7, x5, x6\n' +
+  '    jal x2, store\n' +
+  '    jalr x0, 0(x1)\n';

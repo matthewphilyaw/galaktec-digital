@@ -1,4 +1,4 @@
-export class OpcodeConstants {
+export class FullOpcodeConstants {
   public static LUI: number = 0b0110111;
   public static AUIPC: number = 0b0010111;
   public static JAL: number = 0b1101111;
@@ -36,4 +36,16 @@ export class OpcodeConstants {
   public static SRA: number = 0b0100000_101_0110011;
   public static OR: number = 0b110_0110011;
   public static AND: number = 0b111_0110011;
+}
+
+export class OpcodeGroupsConstants {
+  public static LUI: number = 0b0110111;
+  public static AUIPC: number = 0b0010111;
+  public static JAL: number = 0b1101111;
+  public static JALR: number = 0b1100111;
+  public static BRANCHING = 0b1100011;
+  public static LOAD = 0b0000011;
+  public static STORE = 0b0100011;
+  public static ALU_IMMEDIATE = 0b0010011;
+  public static ALU = 0b0110011;
 }

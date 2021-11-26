@@ -36,7 +36,7 @@ export abstract class InstructionAssembler {
     this.f7 = f7;
   }
 
-  abstract assemble(instruction: Instruction, symbolTable: SymbolTable): IntermediateInstruction
+  abstract assemble(instruction: Instruction, symbolTable: SymbolTable, pc: number): IntermediateInstruction
 }
 
 export class ITypeAssembler extends InstructionAssembler {
@@ -118,7 +118,7 @@ export class UTypeAssembler extends InstructionAssembler {
 }
 
 export class JTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction, symbolTable: SymbolTable): IntermediateInstruction {
+  assemble(instruction: Instruction, symbolTable: SymbolTable, pc: number): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -139,7 +139,7 @@ export class JTypeAssembler extends InstructionAssembler {
       );
 
       symbolTable.onLabelAddressResolve(symbol, (addr) => {
-        intermediate.immediate = addr;
+        intermediate.immediate = addr - pc;
       });
     } else {
       const imm = (((instruction.argTokens[1] as Token).value) as unknown) as number;
@@ -271,7 +271,7 @@ function formatInstruction(instruction: astat.Instruction): string {
   return `opcode: ${instruction.opcodeToken.value} ${argList}`;
 }
 
-export function assembleStatement(instruction: astat.Instruction, symbolTable: SymbolTable): IntermediateInstruction | AssemblerError {
+export function assembleStatement(instruction: astat.Instruction, symbolTable: SymbolTable, pc: number): IntermediateInstruction | AssemblerError {
   const instrAssembler = instructionAssemblerLookup[instruction.opcodeToken.value.toUpperCase()];
 
   if (!instrAssembler) {
@@ -282,6 +282,6 @@ export function assembleStatement(instruction: astat.Instruction, symbolTable: S
     );
   }
 
-  return instrAssembler.assemble(instruction, symbolTable);
+  return instrAssembler.assemble(instruction, symbolTable, pc);
 }
 

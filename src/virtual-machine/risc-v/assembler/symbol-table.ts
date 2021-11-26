@@ -53,7 +53,7 @@ export class SymbolTable {
       throw new Error(`Can not set the address of undefined Label: ${name}`);
     }
 
-    if (!labelSymbol.address) {
+    if (labelSymbol.address === undefined) {
       throw new Error(`Label: ${name} has not been assigned an address`);
     }
 

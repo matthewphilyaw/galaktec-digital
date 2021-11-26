@@ -48,14 +48,16 @@ export function assemble(program: string, targetMemSize: number): AssemblerConte
 
   const programIntermediates = [];
 
+  let programCounter = 0;
   for (const statement of parsedProgram) {
     if (statement instanceof astat.Instruction) {
-      const assembled = ainst.assembleStatement(statement, symbolTable);
+      const assembled = ainst.assembleStatement(statement, symbolTable, programCounter);
 
       if (assembled instanceof AssemblerError) {
         throw assembled;
       } else if (assembled instanceof IntermediateInstruction) {
         programIntermediates.push(assembled);
+        programCounter += 4;
       } else {
       }
     } else if (statement instanceof astat.Label) {

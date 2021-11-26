@@ -14,14 +14,12 @@
         <template
             v-if="programDump">
         <div v-for="row in programDump.formattedLines"
-             :key="row[0]"
              class="addr-line"
              :class="row[0] === programCounter.toString(16).padStart(8, '0') ? 'current-line' : 'other-line'">
           <div class="addr-start">{{ row[0] }}</div>
           <div class="addr-value-line">
             <div class="addr-value"
-                 v-for="col in row.slice(1)"
-                 :key="col">{{ col }}</div>
+                 v-for="col in row.slice(1)">{{ col }}</div>
           </div>
         </div>
         </template>
@@ -34,13 +32,11 @@
       <div class="addr-container"
            v-if="ramDump">
         <div v-for="row in ramDump.formattedLines"
-             :key="row[0]"
              class="addr-line">
           <div class="addr-start">{{ row[0] }}</div>
           <div class="addr-value-line">
             <div class="addr-value"
-                 v-for="col in row.slice(1)"
-                 :key="col">{{ col }}</div>
+                 v-for="col in row.slice(1)">{{ col }}</div>
           </div>
         </div>
       </div>
@@ -51,7 +47,6 @@
       </div>
       <template v-if="registerDump">
         <div v-for="row in registerDump"
-             :key="row[0]"
              class="addr-line">
           <div class="addr-start" v-if="row[0].length === 2">&nbsp;{{ row[0] }}</div>
           <div class="addr-start" v-if="row[0].length === 3">{{ row[0] }}</div>
