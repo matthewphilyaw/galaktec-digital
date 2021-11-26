@@ -139,7 +139,7 @@ export class ProtoCore {
       case OpcodeGroupsConstants.JALR:
       case OpcodeGroupsConstants.ALU_IMMEDIATE:
       case OpcodeGroupsConstants.LOAD:
-        immediate = (instruction >>> 20) & 0xfff;
+        immediate = (((instruction >>> 20) & 0xfff) << 20) >> 20;
         decoded = new DecodedInstruction(
           InstructionFormat.I,
           (funct3 << 7) | opcode,
@@ -200,7 +200,7 @@ export class ProtoCore {
           InstructionFormat.U,
           opcode,
           rd,
-          r1 === 0 ? 0 : this.registers[r1],
+          0,
           0,
           immediate
         );
@@ -225,20 +225,52 @@ export class ProtoCore {
       case FullOpcodeConstants.ADD: // add
         this.executionResult = instruction.firstRegisterValue + instruction.secondRegisterValue;
         break;
+      case FullOpcodeConstants.SLT:
+        if (instruction.firstRegisterValue < instruction.secondRegisterValue) {
+          this.executionResult = 1;
+        } else {
+          this.executionResult = 0;
+        }
+        break;
+      case FullOpcodeConstants.SLTU: {
+        const reg1UnsignedVal = instruction.firstRegisterValue >>> 0;
+        const reg2UnsignedVal = instruction.secondRegisterValue >>> 0;
+
+        if (reg1UnsignedVal === 0) {
+          if (reg2UnsignedVal !== reg1UnsignedVal) {
+            this.executionResult = 1;
+          } else {
+            this.executionResult = 0;
+          }
+
+        } else if (reg1UnsignedVal < reg2UnsignedVal) {
+          this.executionResult = 1;
+        }
+        else {
+          this.executionResult = 0;
+        }
+
+        break;
+      }
       case FullOpcodeConstants.SUB:
         this.executionResult = instruction.secondRegisterValue - instruction.firstRegisterValue;
+        break;
+      case FullOpcodeConstants.LUI:
+        this.executionResult = instruction.immediate;
+        break;
+      case FullOpcodeConstants.AUIPC:
+        this.executionResult = this.pc + instruction.immediate;
         break;
       case FullOpcodeConstants.JAL:
         this.executionResult = this.pc + 4; // result is the return address PC + 4
         this.pc = this.pc + instruction.immediate;
         this.jump = true;
         break;
-      case FullOpcodeConstants.JALR: {
+      case FullOpcodeConstants.JALR:
         this.executionResult = this.pc + 4; // result is the return address PC + 4
         this.pc = (instruction.firstRegisterValue + instruction.immediate) & 0xFFFF_FFFE;
         this.jump = true;
         break;
-      }
       default:
         throw new Error('unknown instruction');
     }

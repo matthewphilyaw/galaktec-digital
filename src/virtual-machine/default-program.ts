@@ -15,7 +15,7 @@ export const sampleProgram =
   '\n' +
   'lw x6, 0x80(x0)\n' +
   'jal x1, add_routine\n' +
-  'jalr x0, 0(x0)\n' +
+  'jal x0, start\n' +
   '\n' +
   'store:\n' +
   '    sw x7, 0x80(x0)\n' +

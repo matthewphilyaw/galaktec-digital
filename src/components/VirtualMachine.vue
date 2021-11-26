@@ -245,7 +245,7 @@ export default defineComponent({
       for (let i = 0; i < 32; i++) {
         formattedReg.push([
           `x${i.toString()}`,
-          store.state.cpuState.registers[i].toString(16).padStart(8, '0')
+          (store.state.cpuState.registers[i] >>> 0).toString(16).padStart(8, '0')
         ]);
       }
 
