@@ -41,6 +41,42 @@ export abstract class InstructionAssembler {
 
 export class ITypeAssembler extends InstructionAssembler {
   assemble(instruction: Instruction): IntermediateInstruction {
+    // TODO: Revisit this. If pseudo instruction needs to emit more than one instruction this does not work.
+    // TODO: Potentially need to the building of the instruction outside of the assembler
+    switch (instruction.opcodeToken.text.toLowerCase()) {
+      case 'nop':
+        return this.buildPseudoNOP(instruction);
+      case 'ret':
+        return this.buildPseudoRET(instruction);
+      default:
+        return this.buildGenericIType(instruction);
+    }
+
+  }
+
+  buildPseudoNOP(instruction: Instruction): IntermediateInstruction {
+    return new ITypeIntermediate(
+      REGISTER_MAP['x0'],
+      REGISTER_MAP['x0'],
+      0,
+      this.opcode,
+      instruction,
+      this.f3
+    );
+  }
+
+  buildPseudoRET(instruction: Instruction): IntermediateInstruction {
+    return new ITypeIntermediate(
+      REGISTER_MAP['x0'],
+      REGISTER_MAP['x1'],
+      0,
+      this.opcode,
+      instruction,
+      this.f3
+    );
+  }
+
+  buildGenericIType(instruction: Instruction): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
@@ -66,12 +102,12 @@ export class ITypeAssembler extends InstructionAssembler {
     }
 
     return new ITypeIntermediate(
-        REGISTER_MAP[rd],
-        REGISTER_MAP[rs1],
-        imm,
-        this.opcode,
-        instruction,
-        this.f3
+      REGISTER_MAP[rd],
+      REGISTER_MAP[rs1],
+      imm,
+      this.opcode,
+      instruction,
+      this.f3
     );
   }
 }
@@ -205,6 +241,7 @@ export const instructionAssemblerLookup: Record<string, InstructionAssembler> = 
   'AUIPC': new UTypeAssembler(0b0010111),
   'JAL': new JTypeAssembler(0b1101111),
   'JALR': new ITypeAssembler(0b1100111),
+  'RET': new ITypeAssembler(0b1100111),
   'BEQ': new BTypeAssembler(0b1100011, 0b000),
   'BNE': new BTypeAssembler(0b1100011, 0b001),
   'BLT': new BTypeAssembler(0b1100011, 0b100),
@@ -220,6 +257,7 @@ export const instructionAssemblerLookup: Record<string, InstructionAssembler> = 
   'SH': new STypeAssembler(0b0100011, 0b001),
   'SW': new STypeAssembler(0b0100011, 0b010),
   'ADDI': new ITypeAssembler(0b0010011,0b000 ),
+  'NOP': new ITypeAssembler(0b0010011,0b000 ),
   'SLTI': new ITypeAssembler(0b0010011, 0b010),
   'SLTIU': new ITypeAssembler(0b0010011, 0b011),
   'XORI': new ITypeAssembler(0b0010011, 0b100),

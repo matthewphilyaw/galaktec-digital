@@ -177,6 +177,10 @@ export default defineComponent({
     });
 
     function loadProgram() {
+      codeMirror.eachLine((lh: object) => {
+        codeMirror.removeLineClass(lh, 'background', null);
+      });
+
       const program = codeMirror.getValue();
       store.commit(LOAD_PROGRAM, program);
     }

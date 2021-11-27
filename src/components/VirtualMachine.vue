@@ -67,6 +67,14 @@
         </div>
         <div class="state-group program-counter-color">
           <div class="state-header">
+            Formatted Instruction ({{intermediateInstruction?.instructionFormatType}}) at PC
+          </div>
+          <div class="state-content program-counter">
+            {{ intermediateInstruction?.formattedEncodedInstructions[0] }}
+          </div>
+        </div>
+        <div class="state-group program-counter-color">
+          <div class="state-header">
             Pipeline Stage
           </div>
           <div class="state-content pipeline-container">
@@ -97,7 +105,7 @@
             Fetched Instruction
           </div>
           <div class="state-content program-counter">
-            {{ cpuState ? cpuState.fetchedInstruction.toString(16).padEnd(8, '0') : 'N/A' }}
+            {{ cpuState ? cpuState.fetchedInstruction.toString(16).padStart(8, '0').padEnd(8, '0') : 'N/A' }}
           </div>
         </div>
         <div class="state-group program-counter-color">
@@ -108,9 +116,9 @@
             <div class="pull-right">instr fmt</div><div>{{cpuState ? cpuState.decodedInstruction?.instructionFormat : '' }}</div>
             <div class="pull-right">full Opcode</div><div>{{cpuState ? cpuState.decodedInstruction?.fullOpcode.toString(2) : '' }}</div>
             <div class="pull-right">dest reg</div><div>{{cpuState ? cpuState.decodedInstruction?.destinationRegisterIndex : '' }}</div>
-            <div class="pull-right">first reg</div><div>{{cpuState ? cpuState.decodedInstruction?.firstRegisterValue.toString(16).padStart(8, '0') : '' }}</div>
-            <div class="pull-right">second reg</div><div>{{cpuState ? cpuState.decodedInstruction?.secondRegisterValue.toString(16).padStart(8, '0') : '' }}</div>
-            <div class="pull-right">immediate</div><div>{{cpuState ? cpuState.decodedInstruction?.immediate.toString(16).padStart(8,'0') : '' }}</div>
+            <div class="pull-right">first reg</div><div>{{cpuState ? (cpuState.decodedInstruction?.firstRegisterValue >>> 0).toString(16).padStart(8, '0') : '' }}</div>
+            <div class="pull-right">second reg</div><div>{{cpuState ? (cpuState.decodedInstruction?.secondRegisterValue >>> 0).toString(16).padStart(8, '0') : '' }}</div>
+            <div class="pull-right">immediate</div><div>{{cpuState ? (cpuState.decodedInstruction?.immediate >>> 0).toString(16).padStart(8,'0') : '' }}</div>
           </div>
         </div>
         <div class="state-group program-counter-color">
@@ -118,7 +126,7 @@
             Execute Result
           </div>
           <div class="state-content program-counter">
-            {{ cpuState ? cpuState.ALUResult.toString(16).padEnd(8, '0') : 'N/A' }}
+            {{ cpuState ? (cpuState.ALUResult >>> 0).toString(16).padEnd(8, '0') : 'N/A' }}
           </div>
         </div>
         <div class="state-group program-counter-color">
@@ -126,7 +134,7 @@
             Memory Access Result
           </div>
           <div class="state-content program-counter">
-            {{ cpuState ? cpuState.memoryAccessResult.toString(16).padEnd(8, '0') : 'N/A' }}
+            {{ cpuState ? (cpuState.memoryAccessResult >>> 0).toString(16).padEnd(8, '0') : 'N/A' }}
           </div>
         </div>
       </div>
@@ -146,16 +154,16 @@
              v-if="!programLoaded || vmHalted" ></div>
         <button class="cmd-item x2 spacer-top"
                 v-if="programLoaded && !vmHalted"
-                @click="step()">
-          Step
+                @click="run()">
+          Run
         </button>
         <div class="fill x1 spacer-top"></div>
         <div class="fill x2 spacer-top"
              v-if="!programLoaded || vmHalted" ></div>
         <button class="cmd-item x2 spacer-top"
                 v-if="programLoaded && !vmHalted"
-                @click="next()">
-          Next
+                @click="step()">
+          Step
         </button>
         <div class="fill xf spacer-top"></div>
       </div>
@@ -170,7 +178,7 @@
 import { defineComponent, computed } from 'vue';
 import { useStore } from 'vuex';
 import Knife from '../components/theme/Knife.vue';
-import { RESET_VM, STEP_VM, NEXT_VM } from '@/store/mutations';
+import { RESET_VM, STEP_VM, RUN_VM } from '@/store/mutations';
 import { RootState } from '@/store';
 import { MemoryRegionDump } from '@/virtual-machine/risc-v/cpu-cores/peripherals/memory';
 
@@ -235,6 +243,7 @@ export default defineComponent({
     });
 
     const cpuState = computed(() => store.state.cpuState);
+
     const registerDump = computed(() => {
       const formattedReg: string[][] = [];
 
@@ -253,19 +262,23 @@ export default defineComponent({
     });
 
     const programCounter = computed(() => store.state.programCounter);
+    const intermediateInstruction = computed(() => {
+      return store.state.intermediateInstruction;
+    });
 
 
     return {
       reset: () => store.commit(RESET_VM),
       step: () => store.commit(STEP_VM),
-      next: () => store.commit(NEXT_VM),
+      run: () => store.commit(RUN_VM),
       programLoaded,
       vmHalted,
       programDump,
       ramDump,
       cpuState,
       registerDump,
-      programCounter
+      programCounter,
+      intermediateInstruction
     }
   }
 });
@@ -285,7 +298,7 @@ export default defineComponent({
     margin: 0;
     padding: 0.5rem 1rem;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) 70px;
+    grid-template-columns: 0.5fr 0.5fr 0.30fr 1fr 75px;
     grid-template-rows: 35px auto;
 
     .top-handle {

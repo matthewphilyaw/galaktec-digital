@@ -23,12 +23,13 @@ export abstract class IntermediateInstruction {
   public f3?: number;
   public f7?: number;
   public instructionStatement: Instruction;
+  public instructionFormatType: string;
 
   public assembledAddress: number;
   public encodedInstructions: number[];
   public formattedEncodedInstructions: string[];
 
-  protected constructor(opcode: number, instruction: Instruction, f3?: number, f7?: number) {
+  protected constructor(opcode: number, instruction: Instruction, instructionFormatType: string, f3?: number, f7?: number) {
     this.opcode = opcode;
     this.instructionStatement = instruction;
     this.f3 = f3;
@@ -37,6 +38,7 @@ export abstract class IntermediateInstruction {
     this.assembledAddress = 0;
     this.encodedInstructions = [];
     this.formattedEncodedInstructions = [];
+    this.instructionFormatType = instructionFormatType;
   }
 
   abstract encode(): void;
@@ -56,7 +58,7 @@ export class RTypeIntermediate extends IntermediateInstruction{
     f3?: number,
     f7?: number
   ) {
-    super(opcode, instruction, f3, f7);
+    super(opcode, instruction, 'R', f3, f7);
 
     this.rdIndex = rdIndex;
     this.rs1Index = rs1Index;
@@ -91,7 +93,7 @@ export class ITypeIntermediate extends IntermediateInstruction {
     instruction: Instruction,
     f3?: number
   ) {
-    super(opcode, instruction, f3);
+    super(opcode, instruction, 'I', f3);
 
     this.rdIndex = rdIndex;
     this.rs1Index = rs1Index;
@@ -129,7 +131,7 @@ export class SBTypeIntermediate extends IntermediateInstruction {
     instruction: Instruction,
     f3?: number
   ) {
-    super(opcode, instruction, f3);
+    super(opcode, instruction, stype ? 'S' : 'B', f3);
 
     this.stype = stype;
 
@@ -179,7 +181,7 @@ export class UJTypeIntermediate extends IntermediateInstruction {
     instruction: Instruction,
     immediate?: number,
 ) {
-    super(opcode, instruction);
+    super(opcode, instruction, utype ? 'U' : 'J');
 
     this.utype = utype;
 

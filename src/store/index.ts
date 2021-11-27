@@ -5,10 +5,12 @@ import { CoreState } from '@/virtual-machine/risc-v/cpu-cores/proto-core';
 import {
   LOAD_PROGRAM,
   RESET_VM,
-  STEP_VM, NEXT_VM
+  STEP_VM, RUN_VM
 } from './mutations';
 
 import { VM } from '@/virtual-machine/vm';
+import { Instruction } from '@/virtual-machine/grammar/assembly-statements';
+import { IntermediateInstruction } from '@/virtual-machine/risc-v/assembler/intermediate-types';
 
 export interface RootState {
   programLoaded: boolean,
@@ -19,6 +21,7 @@ export interface RootState {
   cpuState?: CoreState,
   programCounter: number,
   currentLineNumber: number,
+  intermediateInstruction: IntermediateInstruction | undefined
 }
 
 let vm: VM;
@@ -31,7 +34,9 @@ function updateStateFromVM(vm: VM, state: RootState): void {
   state.ramDump = vm.getRam();
   state.registerDump = state.cpuState.registers;
 
-  state.currentLineNumber = vm.getCurrentIntermediateInstruction().instructionStatement.opcodeToken.line;
+  const intermediateInstruction = vm.getCurrentIntermediateInstruction();
+  state.currentLineNumber = intermediateInstruction.instructionStatement.opcodeToken.line;
+  state.intermediateInstruction = intermediateInstruction;
 
   state.programLoaded = true;
 }
@@ -47,6 +52,7 @@ export const store = createStore<RootState>({
       cpuState: undefined,
       programCounter: 0,
       currentLineNumber: 0,
+      intermediateInstruction: undefined
     };
   },
   mutations: {
@@ -73,7 +79,7 @@ export const store = createStore<RootState>({
       }
       updateStateFromVM(vm, state);
     },
-    [NEXT_VM](state: RootState) {
+    [RUN_VM](state: RootState) {
       try {
         // Either mid execution of pipeline
         // or on the initial state.

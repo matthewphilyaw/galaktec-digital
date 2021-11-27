@@ -35,6 +35,7 @@ export interface CoreState {
 export class ProtoCore {
   public  memoryController: MemoryController;
   private pc: number;
+  private nextPc: number;
   private registers: number[] = new Array(32).fill(0);
 
   private instruction: number;
@@ -49,6 +50,7 @@ export class ProtoCore {
   constructor(memoryController: MemoryRegion[]) {
     this.memoryController = new MemoryController(memoryController);
     this.pc = 0;
+    this.nextPc = 0;
     this.state = 'fetch';
 
     this.instruction = 0;
@@ -109,6 +111,7 @@ export class ProtoCore {
         if (!this.jump) {
           this.pc += 4;
         } else {
+          this.pc = this.nextPc;
           this.jump = false;
         }
         break;
@@ -263,12 +266,12 @@ export class ProtoCore {
         break;
       case FullOpcodeConstants.JAL:
         this.executionResult = this.pc + 4; // result is the return address PC + 4
-        this.pc = this.pc + instruction.immediate;
+        this.nextPc = this.pc + instruction.immediate;
         this.jump = true;
         break;
       case FullOpcodeConstants.JALR:
         this.executionResult = this.pc + 4; // result is the return address PC + 4
-        this.pc = (instruction.firstRegisterValue + instruction.immediate) & 0xFFFF_FFFE;
+        this.nextPc = (instruction.firstRegisterValue + instruction.immediate) & 0xFFFF_FFFE;
         this.jump = true;
         break;
       default:

@@ -1,27 +1,73 @@
 export const sampleProgram =
-  '# Write program here\n' +
+  '# RISC V Emulator\n' +
+  '# NOTE: Not all instructions are implemented yet; this is a \n' +
+  '# work in progress. \n' +
   '\n' +
-  '# By clicking step you will see the VM\n' +
-  '# step the virutal CPU through its 5 stage pipeline\n' +
-  '# and create the side effects in te memories.\n' +
+  '# Load: loads program and resets VM.\n' +
+  '# Reset: resets VM clearing RAM, Registers and Program Counter (PC).\n' +
+  '# Run: run the instruction through the five-stage pipeline.\n' +
+  '# Step: manually step through each stage of the pipeline.\n' +
   '\n' +
-  '# NOTE: One instruction takes 5 steps to fully execute\n' +
-  '#       meaning you must click step 5 times to get to\n' +
-  '#       next instruction. \n' +
+  '# The five stages are: Fetch (FE), Decode (DE), Execute (EX),\n' +
+  '# Memory Access (MEM) and Write Back (WB).\n' +
   '\n' +
+  '# This sample program plays with pushing the return address on the\n' +
+  '# stack and then popping before returning from the routine to ensure\n' +
+  '# it makes it back to the right location.\n' +
   'start:\n' +
-  'addi  x5, x0, 15\n' +
-  'sw    x5, 0x80(x0)\n'+
+  '\n'+
+  '# Set the stack pointer (SP) to the end of RAM intentionally to\n' +
+  '# allow each push to do an "addi" to grow the stack before setting\n' +
+  '# a value without worrying about special cases (at least in this\n' +
+  '# simple program).\n' +
+  'addi sp, 0xc0(zero)\n' +
   '\n' +
-  'lw x6, 0x80(x0)\n' +
-  'jal x1, add_routine\n' +
-  'jal x0, start\n' +
+  '# Stores an increment value in RAM @ 0x90\n' +
+  '# and each time through the loop, the increment is increased by 1\n' +
+  'loop:\n' +
+  '    jal ra, add_routine\n' +
+  '\n' +
+  '    lw t1, 0x90(zero)\n' +
+  '    addi t1, t1, 1\n' +
+  '    sw t1, 0x90(zero)\n' +
+  '\n' +
+  '    jal zero, loop\n' +
   '\n' +
   'store:\n' +
-  '    sw x7, 0x80(x0)\n' +
-  '    jalr x0, 0(x2)\n' +
+  '    # Push ra on  the stack.\n' +
+  '    addi sp, -4(sp)\n' +
+  '	sw ra, 0(sp)\n' +
+  '\n' +
+  '    \n' +
+  '    # Store function arg (a1) into ram.\n' +
+  '    sw a1, 0x80(zero)\n' +
+  '    \n' +
+  '    # Pop value off of the stack.\n' +
+  '    lw ra, 0(sp)\n' +
+  '    addi sp, 4(sp)\n' +
+  '    \n' +
+  '    ret\n' +
   '\n' +
   'add_routine:\n' +
-  '    add x7, x5, x6\n' +
-  '    jal x2, store\n' +
-  '    jalr x0, 0(x1)\n';
+  '    # Push ra on the stack.\n' +
+  '    addi sp, -4(sp)\n' +
+  '	sw ra, 0(sp)\n' +
+  '\n' +
+  '	# Taking increment stored in RAM @ 0x90\n' +
+  '    # and always add 11 to it.\n' +
+  '    lw t1, 0x90(zero)\n' +
+  '    \n' +
+  '    # This is not optimal code; it is simply exercising the various instructions.\n' +
+  '    addi t2, zero, 11\n' +
+  '    \n' +
+  '    # Use a1 to follow the ABI for passing function args.\n' +
+  '    add a1, t1, t2\n' +
+  '    \n' +
+  '    # Jump to routine.\n' +
+  '    jal ra, store\n' +
+  '    \n' +
+  '    # Pop value off of the stack.\n' +
+  '    lw ra, 0(sp)\n' +
+  '    addi sp, 4(sp)\n' +
+  '\n' +
+  '    ret\n';
