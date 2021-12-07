@@ -1,5 +1,5 @@
 import {MemoryController, MemoryRegion} from './peripherals/memory';
-import { FullOpcodeConstants, OpcodeGroupsConstants } from '@/virtual-machine/risc-v/cpu-cores/opcode';
+import { FullOpcodeConstants, OpcodeGroupsConstants } from './opcode';
 
 enum InstructionFormat {
   R,

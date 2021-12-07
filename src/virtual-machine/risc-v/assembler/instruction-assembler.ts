@@ -1,29 +1,14 @@
-import * as astat from '@/virtual-machine/grammar/assembly-statements';
-import { Instruction, PseudoRelocation, Offset } from '@/virtual-machine/grammar/assembly-statements';
+import * as astat from '../../grammar/assembly-statements';
+import { Instruction, PseudoRelocation, Offset } from '../../grammar/assembly-statements';
 import { Token } from 'moo';
-import {
-  I_TYPE_PATTERN,
-  R_TYPE_PATTERN,
-  S_TYPE_PATTERN,
-  U_TYPE_PATTERN,
-  J_TYPE_PATTERN,
-  B_TYPE_PATTERN,
-  encodeRType,
-  encodeIType,
-  encodeSType,
-  encodeUType,
-  encodeJType,
-  encodeBType,
-} from '@/virtual-machine/risc-v/assembler/instruction-type-encoder';
-import { AssembledInstruction, AssemblerError } from '@/virtual-machine/risc-v/assembler/assembler';
-import { REGISTER_MAP } from '@/virtual-machine/risc-v/assembler/resgisters';
-import { binWord, Chunk } from '@/virtual-machine/utils/binary-string-formatter';
+import { AssemblerError } from './assembler';
+import { REGISTER_MAP } from './resgisters';
 import {
   IntermediateInstruction,
   ITypeIntermediate, RTypeIntermediate,
   SBTypeIntermediate, UJTypeIntermediate
-} from "@/virtual-machine/risc-v/assembler/intermediate-types";
-import { SymbolTable } from '@/virtual-machine/risc-v/assembler/symbol-table';
+} from "./intermediate-types";
+import { SymbolTable } from './symbol-table';
 
 export abstract class InstructionAssembler {
   protected opcode: number;

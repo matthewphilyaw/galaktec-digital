@@ -1,0 +1,56 @@
+:root {
+  --mk-blue: #78DCE8;
+  --mk-green: #a9dc76;
+  --mk-purple: #AB9DF2;
+  --mk-pink: #FF6188;
+  --mk-yellow: #FFD866;
+  --mk-orange: #FC9867;
+  --mk-yellow-trans: #FFD86640;
+
+  --primary-color: var(--mk-green);
+  --secondary-color: var(--mk-pink);
+  --surface-color: var(--mk-blue);
+  --background-color: #212121;
+
+  --error-color: var(--mk-orange);
+  --on-primary-color: #FFFFFF;
+  --on-secondary-color: #FFFFFF;
+  --on-surface-color: #FFFFFF;
+  --on-background-color: #FFFFFF;
+  --on-error-color: #FFFFFF;
+  height: 100vh;
+  background-color: var(--background-color);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.material-icons.mk-orange {
+  color: var(--mk-orange);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  padding: 1em;
+}
+
+#root {
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 650px auto;
+}

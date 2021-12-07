@@ -1,7 +1,7 @@
 import { assemble, AssemblerContext } from './risc-v/assembler/assembler';
 import { ProtoCore, CoreState } from './risc-v/cpu-cores/proto-core';
 import { MemoryRegion, MemoryRegionDump } from './risc-v/cpu-cores/peripherals/memory';
-import { IntermediateInstruction } from '@/virtual-machine/risc-v/assembler/intermediate-types';
+import { IntermediateInstruction } from './risc-v/assembler/intermediate-types';
 
 const programMemory: MemoryRegion = {
   regionName: 'program',
