@@ -1,0 +1,16 @@
+.AssemblyEditor {
+    height: 100%;
+    width: 60ch;
+}
+
+@media (min-width: 1800px) {
+    .AssemblyEditor {
+        width: 80ch;
+    }
+}
+
+@media (min-width: 1440px) {
+    .AssemblyEditor {
+        width: 70ch;
+    }
+}
