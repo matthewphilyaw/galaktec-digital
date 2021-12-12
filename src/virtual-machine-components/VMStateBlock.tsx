@@ -8,6 +8,7 @@ import {Button} from '../Button';
 interface FormattedMemoryLine {
   address: string;
   value: string[];
+  highlight: boolean;
 }
 
 interface RegisterLine {
@@ -16,7 +17,7 @@ interface RegisterLine {
   value: string;
 }
 
-function formatMemoryDump(dump?: MemoryRegionDump): FormattedMemoryLine[] {
+function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[]): FormattedMemoryLine[] {
   const addrLines: FormattedMemoryLine[] = [];
 
   if (!dump) {
@@ -29,6 +30,7 @@ function formatMemoryDump(dump?: MemoryRegionDump): FormattedMemoryLine[] {
     const address = dump.regionInfo.startAddress + row;
 
     const line: FormattedMemoryLine = {
+      highlight: highlightAddresses ? highlightAddresses.includes(address) : false,
       address: address.toString(16).padStart(8, '0'),
       value: []
     };
@@ -103,22 +105,37 @@ function PipelineState(props: VMStateBlockProps) {
   )
 }
 
-function RegionDump(props: { region: MemoryRegionDump }) {
-  const { region } = props;
-  const formattedMemory = formatMemoryDump(region);
+function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: number[]}) {
+  const { region, highlightAddresses } = props;
+  const formattedMemory = formatMemoryDump(region, highlightAddresses);
 
   return (
     <Panel headerContent={<StatePanelHeader title={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes)`} />}>
       <div className={styles["state-panel-content"]}>
-        {formattedMemory.map((line) =>
-          <div className={styles['region-dump-line']} key={line.address}>
-            <div className={styles['region-dump-address']}>{line.address}</div>
-            <div className={styles['region-dump-separator']}></div>
-            <div className={styles['region-dump-value-line']}>
-              {line.value.map((byte, i) => <div className={styles['region-dump-value-byte']} key={i}>{byte}</div>)}
-            </div>
-          </div>
-        )}
+        {formattedMemory.map((line) => {
+          if (line.highlight) {
+            return (
+              <div className={[styles['region-dump-line'], styles['region-dump-line-highlight']].join(' ')} key={line.address}>
+                <div className={styles['region-dump-address']}>{line.address}</div>
+                <div className={styles['region-dump-separator-highlight']}></div>
+                <div className={styles['region-dump-value-line']}>
+                  {line.value.map((byte, i) => <div className={styles['region-dump-value-byte']} key={i}>{byte}</div>)}
+                </div>
+              </div>
+            );
+          }
+          else {
+            return (
+              <div className={styles['region-dump-line']} key={line.address}>
+                <div className={styles['region-dump-address']}>{line.address}</div>
+                <div className={styles['region-dump-separator']}></div>
+                <div className={styles['region-dump-value-line']}>
+                  {line.value.map((byte, i) => <div className={styles['region-dump-value-byte']} key={i}>{byte}</div>)}
+                </div>
+              </div>
+            );
+          }
+        })}
       </div>
     </Panel>
   )
@@ -153,7 +170,7 @@ export function VMStateBlock(props: VMStateBlockProps) {
 
   return (
     <div className={styles['state-content']}>
-      <RegionDump region={vmState.programDump} />
+      <RegionDump region={vmState.programDump} highlightAddresses={[vmState.coreState.programCounter]} />
       <RegionDump region={vmState.ramDump} />
       <PipelineState vmState={vmState} />
     </div>

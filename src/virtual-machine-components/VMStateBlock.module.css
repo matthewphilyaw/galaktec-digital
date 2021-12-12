@@ -46,11 +46,6 @@
     gap: 0.5rem;
 }
 
-.region-dump-separator {
-    width: 0.1rem;
-    background: var(--primary-color-dark);
-}
-
 .state-panel-content {
     padding: 0.5rem;
     color: var(--primary-color);
@@ -62,6 +57,21 @@
 .region-dump-line {
     display: flex;
     gap: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+.region-dump-line-highlight {
+    background: var(--primary-color);
+    color: var(--background-color);
+}
+
+.region-dump-separator {
+    width: 0.1rem;
+    background: var(--primary-color-dark);
+}
+
+.region-dump-separator-highlight {
+    width: 0.1rem;
 }
 
 .region-dump-value-line {
