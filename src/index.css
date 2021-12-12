@@ -33,7 +33,7 @@ html {
   --panel-bottom-bar-border-color: var(--panel-bar-bottom-color);
   --panel-bottom-bar-height: var(--panel-bar-height);
 
-  height: calc(100% - 4px);
+  height: calc(100vh - 4px);
   background-color: var(--background-color);
 }
 

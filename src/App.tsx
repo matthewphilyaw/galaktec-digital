@@ -27,7 +27,7 @@ function App() {
       <AppBar onLoad={loadProgram} onRunInstruction={controls.run} onStepInstruction={controls.step} />
       <div className={styles.workspace}>
         <AssemblyEditor initialProgram={programRef.current} onChange={updateProgramRef}  />
-        <VMStateBlock state={vmState} />
+        <VMStateBlock vmState={vmState} />
       </div>
     </div>
 );
