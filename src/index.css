@@ -117,3 +117,15 @@ button {
   color: var(--background-color);
   background: var(--primary-color-light);
 }
+
+::-webkit-scrollbar {
+  width: 0.75rem;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-color-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+}
