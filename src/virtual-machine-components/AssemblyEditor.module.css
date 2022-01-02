@@ -1,29 +1,13 @@
 .AssemblyEditor {
-    --panel-bar-radius: 0.5rem;
-    --panel-bar-top-color: var(--primary-color);
-    --panel-bar-bottom-color: var(--background-color);
-
-    --panel-top-bar-radius: var(--panel-bar-radius);
-    --panel-top-bar-background-color: var(--background-color);
-    --panel-top-bar-border-color: var(--panel-bar-top-color);
-    --panel-top-bar-height: auto;
-
-    --panel-content-background-color: var(--background-color);
-
-    --panel-bottom-bar-radius: var(--panel-bar-radius);
-    --panel-bottom-bar-background-color: var(--panel-bar-bottom-color);
-    --panel-bottom-bar-border-color: var(--panel-bar-bottom-color);
-    --panel-bottom-bar-height: 0;
-
     height: 100%;
     width: 50ch;
 }
 
 .editor-panel-header {
-    color: var(--primary-color);
+    color: var(--primary-color-light);
     width: 100%;
     height: 100%;
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 0.5rem;
     text-transform: capitalize;
     display: flex;
     align-items: center;

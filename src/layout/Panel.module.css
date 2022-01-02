@@ -1,32 +1,30 @@
 
 .container {
     background: var(--background-color);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    border-top-left-radius: var(--panel-top-bar-radius);
-    border-top-right-radius: var(--panel-top-bar-radius);
-    border-bottom-left-radius: var(--panel-bottom-bar-radius);
-    border-bottom-right-radius: var(--panel-bottom-bar-radius);
+    display: grid;
+    grid-template-rows: auto 1fr;
 }
 
-.bar-top {
-    border: 1px solid var(--panel-top-bar-border-color);
-    background: var(--panel-top-bar-background-color);
-    height: var(--panel-top-bar-height);
-    border-top-left-radius:  var(--panel-top-bar-radius);
-    border-top-right-radius:  var(--panel-top-bar-radius);
+.barHeader {
+    background: var(--panel-header-background-color);
+    height: var(--panel-header-height);
+    border: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
 }
 
-.bar-content {
+.barContent {
     background: var(--panel-content-background-color);
-    flex: 1;
+    border: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
+    overflow: auto;
 }
 
-.bar-bottom {
-    border: 1px solid var(--panel-bottom-bar-border-color);
-    background: var(--panel-bottom-bar-background-color);
-    height: var(--panel-bottom-bar-height);
-    border-bottom-left-radius:  var(--panel-bottom-bar-radius);
-    border-bottom-right-radius:  var(--panel-bottom-bar-radius);
+.barContent.u1 {
+    height: 14rem;
+}
+
+.barContent.u2 {
+    height: 18rem;
+}
+
+.barContent.u3 {
+    height: 56rem;
 }

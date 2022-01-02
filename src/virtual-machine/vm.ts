@@ -6,7 +6,7 @@ import { IntermediateInstruction } from './risc-v/assembler/intermediate-types';
 const programMemory: MemoryRegion = {
   regionName: 'program',
   startAddress: 0x0,
-  lengthInBytes: 128,
+  lengthInBytes: 2048,
   accessWidthInBytes: 1,
   clockCyclesForWrite: 4,
   clockCyclesForRead: 4,
@@ -16,8 +16,8 @@ const programMemory: MemoryRegion = {
 // Yes I know Random Access Memory Memory...
 const ramMemory: MemoryRegion = {
   regionName: 'ram',
-  startAddress: 0x80,
-  lengthInBytes: 64,
+  startAddress: 0x800,
+  lengthInBytes: 1024,
   accessWidthInBytes: 1,
   clockCyclesForWrite: 1,
   clockCyclesForRead: 1,

@@ -3,12 +3,12 @@
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    border-bottom: 0.1rem solid var(--primary-color-dark);
+    /*border-bottom: 0.1rem solid var(--primary-color-dark);*/
     padding: 0.5rem 0.75rem;
 }
 
 .logo {
-    color: var(--primary-color);
+    color: var(--primary-color-light);
     height: 100%;
     display: flex;
     gap: 1rem;

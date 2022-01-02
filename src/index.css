@@ -10,28 +10,22 @@ h1, h2, h3, h4, h5 {
 }
 
 html {
+  --background-color: #040A10;
+  --primary-color: #347FC4;
+  --primary-color-dark: #153451;
+  --primary-color-light: #7EAFDD;
+  /*
   --background-color: #120902;
   --primary-color: #E98335;
   --primary-color-dark: #6E370C;
   --primary-color-light: #EFA56C;
+   */
 
-  /* panel defaults */
-  --panel-bar-height: 0.5rem;
-  --panel-bar-radius: 0.1rem;
-  --panel-bar-top-color: var(--primary-color);
-  --panel-bar-bottom-color: var(--primary-color);
-
-  --panel-top-bar-radius: var(--panel-bar-radius);
-  --panel-top-bar-background-color: var(--panel-bar-top-color);
-  --panel-top-bar-border-color: var(--panel-bar-top-color);
-  --panel-top-bar-height: var(--panel-bar-height);
-
+  --panel-header-height: 2rem;
+  --panel-header-background-color: var(--background-color);
+  --panel-header-border-thickness: 1px;
+  --panel-header-border-color: var(--primary-color-dark);
   --panel-content-background-color: var(--background-color);
-
-  --panel-bottom-bar-radius: var(--panel-bar-radius);
-  --panel-bottom-bar-background-color: var(--panel-bar-bottom-color);
-  --panel-bottom-bar-border-color: var(--panel-bar-bottom-color);
-  --panel-bottom-bar-height: var(--panel-bar-height);
 
   height: calc(100vh - 4px);
   background-color: var(--background-color);
@@ -61,63 +55,6 @@ button {
   margin: 0;
 }
 
-.button {
-  border: 0.1rem solid var(--primary-color);
-  border-radius: 0.25rem;
-  background: var(--background-color);
-  color: var(--primary-color-light);
-  font-family: -system-ui, sans-serif;
-  font-size: 1rem;
-  line-height: 1.2;
-  white-space: nowrap;
-  text-decoration: none;
-  padding: 0.1rem 0.5rem;
-  margin: 0;
-  cursor: pointer;
-
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-
-  outline: 2px solid HSL(0 0% 100%/0);
-  outline-offset: -2px;
-
-  transition:
-          outline 250ms ease-in-out,
-          background 250ms ease-in-out,
-          color 250ms ease-in-out;
-  position: relative;
-}
-
-.button-icon {
-  font-size: 2rem;
-}
-
-.button-text {
-
-}
-
-.button-icon-margin {
-  margin-right: 0.2rem;
-}
-
-.button:hover::before,
-.button:focus::before
-{
-  transform: scale(1);
-}
-
-.button:hover {
-  cursor: pointer;
-  outline: 2px solid var(--primary-color-light);
-  outline-offset: -2px;
-}
-
-.button:active {
-  color: var(--background-color);
-  background: var(--primary-color-light);
-}
-
 ::-webkit-scrollbar {
   width: 0.75rem;
 }
@@ -129,3 +66,8 @@ button {
 ::-webkit-scrollbar-thumb {
   background-color: var(--primary-color);
 }
+
+.material-icons-outlined.md-18 { font-size: 18px; }
+.material-icons-outlined.md-24 { font-size: 24px; }
+.material-icons-outlined.md-36 { font-size: 36px; }
+.material-icons-outlined.md-48 { font-size: 48px; }

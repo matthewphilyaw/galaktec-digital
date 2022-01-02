@@ -7,11 +7,7 @@
 }
 
 .workspace {
+    box-sizing: border-box;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 1rem;
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-
-    border-bottom: 0.25rem solid var(--primary-color);
 }
