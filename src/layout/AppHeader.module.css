@@ -15,13 +15,6 @@
     align-items: center;
 }
 
-.controls {
-    /*background: var(--primary-color);*/
-    display: flex;
-    justify-content: space-evenly;
-    gap: 0.25rem;
-}
-
 .menu {
     display: flex;
     justify-content: flex-end;

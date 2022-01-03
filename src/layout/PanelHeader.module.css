@@ -1,0 +1,12 @@
+
+.container {
+    color: var(--primary-color-light);
+    font-weight: 300;
+    width: 100%;
+    height: 100%;
+    padding: 0.5rem 0.5rem;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}

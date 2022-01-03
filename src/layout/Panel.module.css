@@ -1,30 +1,22 @@
 
 .container {
     background: var(--background-color);
-    display: grid;
-    grid-template-rows: auto 1fr;
+    height: auto;
 }
 
 .barHeader {
     background: var(--panel-header-background-color);
-    height: var(--panel-header-height);
+    height: auto;
     border: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
+    border-bottom-color: var(--panel-header-border-color-highlight);
+    border-top-left-radius: var(--panel-header-border-radius);
+    border-top-right-radius: var(--panel-header-border-radius);
 }
 
 .barContent {
     background: var(--panel-content-background-color);
-    border: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
-    overflow: auto;
-}
-
-.barContent.u1 {
-    height: 14rem;
-}
-
-.barContent.u2 {
-    height: 18rem;
-}
-
-.barContent.u3 {
-    height: 56rem;
+    border-left: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
+    border-right: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
+    border-bottom: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
+    height: auto;
 }

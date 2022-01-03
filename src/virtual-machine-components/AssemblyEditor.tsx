@@ -2,6 +2,7 @@ import React, {useEffect} from 'react';
 import Editor, {useMonaco} from '@monaco-editor/react';
 import Panel from '../layout/Panel';
 import styles from './AssemblyEditor.module.css';
+import {PanelHeader} from '../layout/PanelHeader';
 
 export default function AssemblyEditor(props: { initialProgram: string, onChange: (value: string | undefined) => void}) {
   const { initialProgram, onChange } = props;
@@ -17,25 +18,25 @@ export default function AssemblyEditor(props: { initialProgram: string, onChange
           { token: '', background: '040A10'},
           {
             "foreground": "#7EAFDD",
-            "background": "#040A10",
+            "background": "#120902",
             "token": "text source"
           },
           {
             "foreground": "#7EAFDD",
-            "background": "#040A10",
+            "background": "#120902",
             "token": "string.unquoted.heredoc"
           },
           {
             "foreground": "#7EAFDD",
-            "background": "#040A10",
+            "background": "#120902",
             "token": "source source"
           },
         ] ,
         colors: {
           'editor.foreground': '#7EAFDD',
-          'editor.background': '#040A10',
+          'editor.background': '#120902',
           'editorCursor.foreground': '#7EAFDD',
-          'editor.lineHighlightBackground': '#040A10',
+          'editor.lineHighlightBackground': '#120902',
           'editorLineNumber.foreground': '#7EAFDD',
           'editor.selectionBackground': '#7EAFDD',
           'editor.inactiveSelectionBackground': '#7EAFDD'
@@ -46,19 +47,14 @@ export default function AssemblyEditor(props: { initialProgram: string, onChange
     }
   }, [monaco]);
 
-  const header =  (
-    <div className={styles['editor-panel-header']}>
-      <h4 className={"reset-margin"}>Program</h4>
-    </div>
-  );
 
   return (
     <div className={styles.AssemblyEditor}>
-      <Panel headerContent={header} size={'u3'}>
+      <Panel headerContent={<PanelHeader text={'Program'} />}>
         <Editor
           defaultValue={initialProgram}
           defaultLanguage={'text/plain'}
-          height={'100%'}
+          height={'95ch'}
           onChange={onChange}
           options={{
             codeLens: false,

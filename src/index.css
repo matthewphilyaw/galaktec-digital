@@ -10,21 +10,17 @@ h1, h2, h3, h4, h5 {
 }
 
 html {
-  --background-color: #040A10;
-  --primary-color: #347FC4;
-  --primary-color-dark: #153451;
-  --primary-color-light: #7EAFDD;
-  /*
   --background-color: #120902;
   --primary-color: #E98335;
   --primary-color-dark: #6E370C;
   --primary-color-light: #EFA56C;
-   */
 
   --panel-header-height: 2rem;
   --panel-header-background-color: var(--background-color);
   --panel-header-border-thickness: 1px;
   --panel-header-border-color: var(--primary-color-dark);
+  --panel-header-border-color-highlight: var(--primary-color);
+  --panel-header-border-radius: 0.5rem;
   --panel-content-background-color: var(--background-color);
 
   height: calc(100vh - 4px);

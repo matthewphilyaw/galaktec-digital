@@ -3,7 +3,7 @@ import { VMState} from '../hooks/use-virtual-machine';
 import Panel from '../layout/Panel';
 import styles from './VMStateBlock.module.css';
 import {MemoryRegionDump} from '../virtual-machine/risc-v/cpu-cores/peripherals/memory';
-import {ButtonGroup, Buttons} from '../components/ButtonGroup';
+import {PanelHeader} from '../layout/PanelHeader';
 
 interface FormattedMemoryWord {
   value: string[];
@@ -80,20 +80,12 @@ function formatRegisterValues(registers: number[]): RegisterLine[] {
   });
 }
 
-function StatePanelHeader(props: { title: string }) {
-  return (
-      <div className={styles['state-panel-header']}>
-        <h4 className={"reset-margin"}>{props.title}</h4>
-      </div>
-  );
-}
-
 function PipelineState(props: VMStateBlockProps) {
   const { vmState } = props;
 
   return (
     <div className={styles['pipeline-state']}>
-      <Panel headerContent={<StatePanelHeader title={"CPU State"} />} size={'u2'}>
+      <Panel headerContent={<PanelHeader text={"CPU State"} />}>
         <div className={styles['state-panel-content']}>
           <div>PC: {vmState.coreState.programCounter}</div>
           <div>Fetched Instr: {vmState.coreState.fetchedInstruction}</div>
@@ -118,7 +110,7 @@ function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: numb
   const formattedMemory = formatMemoryDump(region, highlightAddresses, wordsPerRow);
 
   return (
-    <Panel headerContent={<StatePanelHeader title={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes)`} />} size={'u1'}>
+    <Panel headerContent={<PanelHeader text={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes)`} />}>
       <div className={styles["region-dump-content"]}>
         {formattedMemory.map((line) => {
           return (
@@ -147,7 +139,7 @@ function RegisterDump(props: { registers: number[]}) {
   const formattedRegisters = formatRegisterValues(registers);
 
   return (
-    <Panel headerContent={<StatePanelHeader title={"Registers"} />} size={'u1'}>
+    <Panel headerContent={<PanelHeader text={"Registers"} />}>
       <div className={[styles['state-panel-content'], styles["register-dump-content"]].join(' ')}>
         {formattedRegisters.map((line) =>
           <div className={styles['register-dump-line']} key={line.name}>

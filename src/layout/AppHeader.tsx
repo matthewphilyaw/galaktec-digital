@@ -1,6 +1,6 @@
-import appBarStyles from './AppBar.module.css';
-import './index.css';
-import {ButtonGroup, Buttons} from './components/ButtonGroup';
+import appBarStyles from './AppHeader.module.css';
+import '../index.css';
+import {ButtonGroup, Buttons} from '../components/ButtonGroup';
 
 export interface AppBarProps {
   onLoad: () => void;
@@ -10,7 +10,7 @@ export interface AppBarProps {
 
 
 
-export default function AppBar(props: AppBarProps) {
+export default function AppHeader(props: AppBarProps) {
   const { onLoad, onStepInstruction, onRunInstruction } = props;
 
   const controlButtons: Buttons[] = [
