@@ -1,5 +1,6 @@
 import {MemoryController, MemoryRegion} from './peripherals/memory';
 import { FullOpcodeConstants, OpcodeGroupsConstants } from './opcode';
+import {signExtend, unsignedValue} from '../../utils/bit-manipulation';
 
 enum InstructionFormat {
   R,
@@ -142,7 +143,7 @@ export class ProtoCore {
       case OpcodeGroupsConstants.JALR:
       case OpcodeGroupsConstants.ALU_IMMEDIATE:
       case OpcodeGroupsConstants.LOAD:
-        immediate = (((instruction >>> 20) & 0xfff) << 20) >> 20;
+        immediate = signExtend((instruction >>> 20), 12);
         decoded = new DecodedInstruction(
           InstructionFormat.I,
           (funct3 << 7) | opcode,
@@ -153,6 +154,16 @@ export class ProtoCore {
         );
         break;
       case OpcodeGroupsConstants.BRANCHING:
+        const imm12 = ((funct7 >>> 6) << 11) | ((rd & 0x1) << 10) | ((funct7 & 0x3f) << 5) | (rd & 0x1e);
+        decoded = new DecodedInstruction(
+          InstructionFormat.B,
+          (funct3 << 7) | opcode,
+          0,
+          r1,
+          r2,
+          signExtend(imm12, 12)
+        );
+        break;
       case OpcodeGroupsConstants.STORE:
         immediate = (funct7 << 5) | rd;
         decoded = new DecodedInstruction(
@@ -161,7 +172,7 @@ export class ProtoCore {
           0,
           r1 === 0 ? 0 : this.registers[r1],
           r2 === 0 ? 0 : this.registers[r2],
-          immediate
+          signExtend(immediate, 12)
         );
         break;
       case OpcodeGroupsConstants.ALU:
@@ -182,7 +193,7 @@ export class ProtoCore {
 
         immediate = 0;
         immediate = (imm20 << 20) | (imm12to19 << 12) | (imm11 << 11) | (imm1to10 << 1);
-        immediate = (((immediate << 12) >> 12));
+        immediate = signExtend(immediate, 20);
 
         decoded = new DecodedInstruction(
           InstructionFormat.J,
@@ -236,8 +247,8 @@ export class ProtoCore {
         }
         break;
       case FullOpcodeConstants.SLTU: {
-        const reg1UnsignedVal = instruction.firstRegisterValue >>> 0;
-        const reg2UnsignedVal = instruction.secondRegisterValue >>> 0;
+        const reg1UnsignedVal = unsignedValue(instruction.firstRegisterValue);
+        const reg2UnsignedVal = unsignedValue(instruction.secondRegisterValue);
 
         if (reg1UnsignedVal === 0) {
           if (reg2UnsignedVal !== reg1UnsignedVal) {
