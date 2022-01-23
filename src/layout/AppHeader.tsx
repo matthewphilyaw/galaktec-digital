@@ -31,12 +31,6 @@ export default function AppHeader(props: AppBarProps) {
     },
   ];
 
-  const menuButtons: Buttons[] = [
-    {
-      icon: 'menu',
-    }
-  ];
-
   return (
     <div className={appBarStyles.AppBar}>
       <div className={appBarStyles.logo}>
@@ -44,9 +38,6 @@ export default function AppHeader(props: AppBarProps) {
         <span className="reset-margin">A division of Gigadyne Systems</span>
       </div>
       <ButtonGroup buttons={controlButtons} size={'medium'} />
-      <nav className={appBarStyles.menu}>
-        <ButtonGroup buttons={menuButtons} size={'medium'} />
-      </nav>
     </div>
   );
 }

@@ -4,8 +4,7 @@ export const sampleProgram =
   '# work in progress. \n' +
   '\n' +
   '# Load: loads program and resets VM.\n' +
-  '# Reset: resets VM clearing RAM, Registers and Program Counter (PC).\n' +
-  '# Run: run the instruction through the five-stage pipeline.\n' +
+  '# Run: run the instruction through a five-stage pipeline.\n' +
   '# Step: manually step through each stage of the pipeline.\n' +
   '\n' +
   '# The five stages are: Fetch (FE), Decode (DE), Execute (EX),\n' +
@@ -51,13 +50,14 @@ export const sampleProgram =
   'add_routine:\n' +
   '    # Push ra on the stack.\n' +
   '    addi sp, -4(sp)\n' +
-  '	sw ra, 0(sp)\n' +
+  '	   sw ra, 0(sp)\n' +
   '\n' +
   '	# Taking increment stored in RAM @ 0x90\n' +
   '    # and always add 11 to it.\n' +
   '    lw t1, 0x90(zero)\n' +
   '    \n' +
-  '    # This is not optimal code; it is simply exercising the various instructions.\n' +
+  '    # This is not optimal code; it is simply exercising\n' +
+  '    # the various instructions.\n' +
   '    addi t2, zero, 11\n' +
   '    \n' +
   '    # Use a1 to follow the ABI for passing function args.\n' +

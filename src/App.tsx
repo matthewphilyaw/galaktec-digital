@@ -1,10 +1,10 @@
 import React, {useRef} from 'react';
 import styles from './App.module.css';
 import AppHeader from './layout/AppHeader';
-import AssemblyEditor from './virtual-machine-components/AssemblyEditor';
 import {sampleProgram} from './virtual-machine/default-program';
 import {VMStateBlock} from './virtual-machine-components/VMStateBlock';
 import {useVirtualMachine} from './hooks/use-virtual-machine';
+import AssemblyEditorCM from './virtual-machine-components/assembly-editor/AssemblyEditorCM';
 
 
 function App() {
@@ -25,7 +25,7 @@ function App() {
     <div className={styles.App}>
       <AppHeader onLoad={loadProgram} onRunInstruction={controls.run} onStepInstruction={controls.step} />
       <div className={styles.workspace}>
-        <AssemblyEditor initialProgram={programRef.current} onChange={updateProgramRef}  />
+        <AssemblyEditorCM initialProgram={programRef.current} onChange={updateProgramRef}  />
         <VMStateBlock vmState={vmState} />
       </div>
     </div>

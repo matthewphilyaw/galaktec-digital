@@ -1,4 +1,7 @@
-.AssemblyEditor {
+.AssemblyEditorCM {
+    margin-left: 1px;
+    margin-top: 1px;
+    margin-bottom: 1px;
     width: 50ch;
 }
 
@@ -14,14 +17,14 @@
 }
 
 @media (min-width: 1600px) {
-    .AssemblyEditor {
-        width: 70ch;
+    .AssemblyEditorCM {
+        width: 80ch;
     }
 }
 
 @media (min-width: 2000px) {
-    .AssemblyEditor {
-        width: 100ch;
+    .AssemblyEditorCM {
+        width: 80ch;
     }
 }
 
