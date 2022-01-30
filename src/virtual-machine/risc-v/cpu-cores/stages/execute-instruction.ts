@@ -21,36 +21,31 @@ executeMap.set(FullOpcodeConstants.BLTU, unknownInstruction);
 executeMap.set(FullOpcodeConstants.BGEU, unknownInstruction);
 executeMap.set(FullOpcodeConstants.LB, unknownInstruction);
 executeMap.set(FullOpcodeConstants.LH, unknownInstruction);
-executeMap.set(FullOpcodeConstants.LW, genericFirstRegPlusImmediate);
+executeMap.set(FullOpcodeConstants.LW, lw);
 executeMap.set(FullOpcodeConstants.LBU, unknownInstruction);
 executeMap.set(FullOpcodeConstants.LHU, unknownInstruction);
 executeMap.set(FullOpcodeConstants.SB, unknownInstruction);
 executeMap.set(FullOpcodeConstants.SH, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SW, genericFirstRegPlusImmediate);
-executeMap.set(FullOpcodeConstants.ADDI, genericFirstRegPlusImmediate);
-executeMap.set(FullOpcodeConstants.SLTI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SLTIU, unknownInstruction);
-executeMap.set(FullOpcodeConstants.XORI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.ORI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.ANDI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SLLI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SRLI, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SRAI, unknownInstruction);
+executeMap.set(FullOpcodeConstants.SW, sw);
+executeMap.set(FullOpcodeConstants.ADDI, addi);
+executeMap.set(FullOpcodeConstants.SLTI, slti);
+executeMap.set(FullOpcodeConstants.SLTIU, sltiu);
+executeMap.set(FullOpcodeConstants.XORI, xori);
+executeMap.set(FullOpcodeConstants.ORI, ori);
+executeMap.set(FullOpcodeConstants.ANDI, andi);
+executeMap.set(FullOpcodeConstants.SLLI, slli);
+executeMap.set(FullOpcodeConstants.SRLI, srli);
+executeMap.set(FullOpcodeConstants.SRAI, srai);
 executeMap.set(FullOpcodeConstants.ADD, add);
 executeMap.set(FullOpcodeConstants.SUB, sub);
-executeMap.set(FullOpcodeConstants.SLL, unknownInstruction);
 executeMap.set(FullOpcodeConstants.SLT, slt);
 executeMap.set(FullOpcodeConstants.SLTU, sltu);
-executeMap.set(FullOpcodeConstants.XOR, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SRL, unknownInstruction);
-executeMap.set(FullOpcodeConstants.SRA, unknownInstruction);
-executeMap.set(FullOpcodeConstants.OR, unknownInstruction);
-executeMap.set(FullOpcodeConstants.AND, unknownInstruction);
-
-function unknownInstruction(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
-  throw new Error(`unsupported instruction as PC(${pc}): ${decodedInstruction.fullOpcode}`);
-}
-
+executeMap.set(FullOpcodeConstants.SLL, sll);
+executeMap.set(FullOpcodeConstants.SRL, srl);
+executeMap.set(FullOpcodeConstants.SRA, sra);
+executeMap.set(FullOpcodeConstants.OR, or);
+executeMap.set(FullOpcodeConstants.AND, and);
+executeMap.set(FullOpcodeConstants.XOR, xor);
 
 export function executeInstruction(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   const execFunc = executeMap.get(decodedInstruction.fullOpcode);
@@ -58,85 +53,184 @@ export function executeInstruction(pc: number, decodedInstruction: DecodedInstru
     throw new Error(`Unable to locate a function to run on FullOpCode(${decodedInstruction.fullOpcode})`);
   }
 
-  return execFunc(pc, decodedInstruction);
+  return truncateTo32(execFunc(pc, decodedInstruction));
 }
 
-export function genericFirstRegPlusImmediate(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function unknownInstruction(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  throw new Error(`unsupported instruction as PC(${pc}): ${decodedInstruction.fullOpcode}`);
+}
+
+function lw(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: decodedInstruction.firstRegisterValue + decodedInstruction.immediate
   };
 }
 
-export function add(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function sw(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue + decodedInstruction.immediate
+  };
+}
+
+function add(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: decodedInstruction.firstRegisterValue + decodedInstruction.secondRegisterValue
   };
 }
 
-export function slt(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
-  let result = 0;
-  if (decodedInstruction.firstRegisterValue < decodedInstruction.secondRegisterValue) {
-    result = 1;
-  }
-
+function slt(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
-    result
+    result: setLessThan(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue)
   };
 }
 
-export function sltu(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
-  const reg1UnsignedVal = unsignedValue(decodedInstruction.firstRegisterValue);
-  const reg2UnsignedVal = unsignedValue(decodedInstruction.secondRegisterValue);
-
-  let result = 0;
-  if (reg1UnsignedVal === 0) {
-  if (reg2UnsignedVal !== reg1UnsignedVal) {
-    result = 1;
-
-  } else {
-    result = 0;
-  }
-
-  } else if (reg1UnsignedVal < reg2UnsignedVal) {
-    result = 1;
-  }
-  else {
-    result = 0;
-  }
-
+function sltu(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
-    result
+    result: setLessThanUnsigned(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue)
   };
 }
 
-export function sub(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function sub(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
-    result: decodedInstruction.secondRegisterValue - decodedInstruction.firstRegisterValue
+    result: decodedInstruction.firstRegisterValue - decodedInstruction.secondRegisterValue
   };
 }
 
-export function lui(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function lui(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: decodedInstruction.immediate
   };
 }
 
-export function auipc(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function auipc(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: pc + decodedInstruction.immediate
   };
 }
 
-export function jal (pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function jal (pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: pc + 4,
     jumpTo: pc + decodedInstruction.immediate
   };
 }
 
-export function jalr (pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+function jalr (pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
   return {
     result: pc + 4,
-    jumpTo: (decodedInstruction.firstRegisterValue + decodedInstruction.immediate) & 0xFFFF_FFFE
+    jumpTo: decodedInstruction.firstRegisterValue + decodedInstruction.immediate
   };
+}
+
+
+function xor(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue ^ decodedInstruction.secondRegisterValue
+  }
+}
+
+function or(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue | decodedInstruction.secondRegisterValue
+  }
+}
+
+function and(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue & decodedInstruction.secondRegisterValue
+  }
+}
+
+function sll(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  const shiftBy = decodedInstruction.secondRegisterValue & 0x1f;
+  return {
+    result: decodedInstruction.firstRegisterValue << shiftBy
+  }
+}
+
+function srl(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  const shiftBy = decodedInstruction.secondRegisterValue & 0x1f;
+  return {
+    result: decodedInstruction.firstRegisterValue >>> shiftBy
+  }
+}
+
+function sra(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  const shiftBy = decodedInstruction.secondRegisterValue & 0x1f;
+  return {
+    result: decodedInstruction.firstRegisterValue >> shiftBy
+  }
+}
+
+function addi(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue + decodedInstruction.immediate
+  };
+
+}
+
+function slti(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: setLessThan(decodedInstruction.firstRegisterValue, decodedInstruction.immediate)
+  };
+}
+
+function sltiu(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: setLessThanUnsigned(decodedInstruction.firstRegisterValue, decodedInstruction.immediate)
+  };
+}
+
+function xori(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue ^ decodedInstruction.immediate
+  };
+}
+
+function ori(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue | decodedInstruction.immediate
+  };
+}
+
+function andi(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue & decodedInstruction.immediate
+  };
+}
+
+function slli(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue << decodedInstruction.immediate
+  };
+}
+
+function srli(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue >>> decodedInstruction.immediate
+  };
+}
+
+function srai(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  return {
+    result: decodedInstruction.firstRegisterValue >> decodedInstruction.immediate
+  };
+}
+
+function truncateTo32(result: ExecutionResult): ExecutionResult {
+  return {
+    result: Math.imul(result.result, 1),
+    jumpTo: result.jumpTo !== undefined ? Math.imul(result.jumpTo, 1) : undefined
+  };
+}
+
+function setLessThan(first: number, second: number): number {
+  return (first < second) ? 1 : 0;
+}
+
+function setLessThanUnsigned(first: number, second: number): number {
+  const firstU = unsignedValue(first);
+  const secondU = unsignedValue(second);
+
+  return ((firstU === 0 && secondU !== firstU) || (firstU < secondU)) ? 1 : 0;
 }

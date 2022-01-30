@@ -1,0 +1,16 @@
+.Console {
+    color: var(--primary-color-light);
+}
+
+.content {
+    padding: 0.5em;
+    height: 30ch;
+    overflow: auto;
+    font-family: 'Roboto Mono', 'sans-serif';
+    font-weight: 500;
+}
+
+.line {
+    text-wrap: none;
+    line-height: 1.4;
+}

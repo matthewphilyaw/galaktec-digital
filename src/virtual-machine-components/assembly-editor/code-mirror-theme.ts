@@ -4,7 +4,7 @@ import {backgroundColorHex, primaryColorDarkHex, primaryColorHex, primaryColorLi
 export const AssemblyTheme = EditorView.theme(
   {
     '&': {
-      height: '100ch',
+      height: '60ch',
       color: primaryColorLightHex,
       background: backgroundColorHex,
       fontSize: '12pt'
@@ -31,6 +31,10 @@ export const AssemblyTheme = EditorView.theme(
 
     '&.cm-focused .cm-selectionBackground, ::selection': {
       background: primaryColorHex,
+      color: backgroundColorHex
+    },
+    '.cm-selectionBackground, ::selection': {
+      background: primaryColorDarkHex,
       color: backgroundColorHex
     },
   },

@@ -83,7 +83,7 @@ export class ProtoCore {
         this.decodedInstruction = undefined;
         this.memoryAccessResult = 0;
 
-        if (!this.executionResult?.jumpTo) {
+        if (this.executionResult?.jumpTo === undefined) {
           this.pc += 4;
         } else {
           this.pc = this.executionResult.jumpTo;
@@ -115,8 +115,26 @@ export class ProtoCore {
     let immediate = 0;
 
     switch (opcode) {
+      case OpcodeGroupsConstants.ALU_IMMEDIATE:{
+        let fullOpCode;
+        if (funct3 === 0b101) {
+          fullOpCode = (funct7 << 10) | (funct3 << 7) | opcode;
+        } else {
+          fullOpCode = (funct3 << 7) | opcode;
+        }
+
+        immediate = signExtend((instruction >>> 20), 12);
+        decoded = new DecodedInstruction(
+          InstructionFormat.I,
+          fullOpCode,
+          rd,
+          r1 === 0 ? 0 : this.registers[r1],
+          0,
+          immediate
+        );
+        break;
+      }
       case OpcodeGroupsConstants.JALR:
-      case OpcodeGroupsConstants.ALU_IMMEDIATE:
       case OpcodeGroupsConstants.LOAD:
         immediate = signExtend((instruction >>> 20), 12);
         decoded = new DecodedInstruction(

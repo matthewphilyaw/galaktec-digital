@@ -87,11 +87,11 @@ function PipelineState(props: VMStateBlockProps) {
     <div className={styles['pipeline-state']}>
       <Panel headerContent={<PanelHeader text={"CPU State"} />}>
         <div className={styles['state-panel-content']}>
-          <div>PC: {vmState.coreState.programCounter}</div>
-          <div>Fetched Instr: {vmState.coreState.fetchedInstruction}</div>
+          <div>PC: {vmState.coreState.programCounter.toString(16).padStart(8, '0')}</div>
+          <div>Fetched Instr: {vmState.coreState.fetchedInstruction.toString(16).padStart(8, '0')}</div>
           <div>Formatted Instr:</div>
-          <div>&emsp;Type: {vmState.intermediateInstruction.instructionFormatType}</div>
-          <div>&emsp;Instr: {vmState.intermediateInstruction.formattedEncodedInstructions}</div>
+          <div>&emsp;Type: {vmState.fetchedInstructionContext?.instructionFormatType}</div>
+          <div>&emsp;Instr: {vmState.fetchedInstructionContext?.formattedEncodedInstructions}</div>
           <div>Full opcode: {vmState.coreState.decodedInstruction?.fullOpcode}</div>
           <div>Reg 1: {vmState.coreState.decodedInstruction?.firstRegisterValue}</div>
           <div>Reg 2: {vmState.coreState.decodedInstruction?.secondRegisterValue}</div>
