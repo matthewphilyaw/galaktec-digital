@@ -147,13 +147,13 @@ export class ProtoCore {
         );
         break;
       case OpcodeGroupsConstants.BRANCHING:
-        const imm12 = ((funct7 >>> 6) << 11) | ((rd & 0x1) << 10) | ((funct7 & 0x3f) << 5) | (rd & 0x1e);
+        const imm12 = ((funct7 >>> 6) << 11) | ((rd & 0x1) << 10) | ((funct7 & 0x3f) << 4) | ((rd & 0x1e) >>> 1 );
         decoded = new DecodedInstruction(
           InstructionFormat.B,
           (funct3 << 7) | opcode,
           0,
-          r1,
-          r2,
+          r1 === 0 ? 0 : this.registers[r1],
+          r2 === 0 ? 0 : this.registers[r2],
           signExtend(imm12, 12)
         );
         break;
@@ -221,7 +221,7 @@ export class ProtoCore {
   }
 
   accessMemory(): void {
-    const opcode = this.decodedInstruction!.fullOpcode & 0x3f;
+    const opcode = this.decodedInstruction!.fullOpcode & 0x7f;
     // If no memory operation is needed then forward the value in execution along
     if (opcode !== OpcodeGroupsConstants.LOAD && opcode !== OpcodeGroupsConstants.STORE) {
       this.memoryAccessResult = this.executionResult!.result;

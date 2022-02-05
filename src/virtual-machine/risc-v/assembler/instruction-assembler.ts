@@ -200,24 +200,50 @@ export class RTypeAssembler extends InstructionAssembler {
 }
 
 export class BTypeAssembler extends InstructionAssembler {
-  assemble(instruction: Instruction): IntermediateInstruction {
+  assemble(instruction: Instruction, symbolTable: SymbolTable, pc: number): IntermediateInstruction {
     if (!instruction.argTokens) {
       throw new Error('argTokens is undefined on instruction. Validate should be called prior to this function to catch these errors');
     }
 
     const rs1 = (instruction.argTokens[0] as Token).value;
     const rs2 = (instruction.argTokens[1] as Token).value;
-    const imm = (((instruction.argTokens[2] as Token).value) as unknown) as number;
+    const immToken = instruction.argTokens[2] as Token;
 
-    return new SBTypeIntermediate(
-      false,
-      REGISTER_MAP[rs1],
-      REGISTER_MAP[rs2],
-      imm,
-      this.opcode,
-      instruction,
-      this.f3
-    );
+    let intermediate: SBTypeIntermediate;
+    if (immToken.type === 'ident') {
+      const symbol = immToken.value;
+
+      intermediate = new SBTypeIntermediate(
+        false,
+        REGISTER_MAP[rs1],
+        REGISTER_MAP[rs2],
+        0,
+        this.opcode,
+        instruction,
+        this.f3
+      );
+
+      symbolTable.onLabelAddressResolve(symbol, (addr) => {
+        intermediate.immediate = addr - pc;
+      });
+    }
+    else {
+      const imm = (((instruction.argTokens[2] as Token).value) as unknown) as number;
+
+      intermediate = new SBTypeIntermediate(
+        false,
+        REGISTER_MAP[rs1],
+        REGISTER_MAP[rs2],
+        imm,
+        this.opcode,
+        instruction,
+        this.f3
+      );
+    }
+
+
+
+    return intermediate;
   }
 }
 

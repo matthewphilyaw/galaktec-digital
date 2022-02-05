@@ -6,7 +6,12 @@ import Panel from '../../layout/Panel';
 import {AssemblySetup} from './code-mirror-setup';
 import {AssemblyTheme} from './code-mirror-theme';
 
-export default function AssemblyEditorCM(props: { initialProgram: string, onChange: (value: string | undefined) => void}) {
+export interface AssemblyEditorCMProps {
+  initialProgram: string;
+  onChange: (value: string | undefined) => void;
+}
+
+export default function AssemblyEditorCM(props: AssemblyEditorCMProps) {
   const { initialProgram, onChange } = props;
 
   const editor = useRef<HTMLDivElement>(null);

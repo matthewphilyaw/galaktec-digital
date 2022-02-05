@@ -13,12 +13,12 @@ executeMap.set(FullOpcodeConstants.LUI, lui);
 executeMap.set(FullOpcodeConstants.AUIPC, auipc);
 executeMap.set(FullOpcodeConstants.JAL, jal);
 executeMap.set(FullOpcodeConstants.JALR, jalr);
-executeMap.set(FullOpcodeConstants.BEQ, unknownInstruction);
-executeMap.set(FullOpcodeConstants.BNE, unknownInstruction);
-executeMap.set(FullOpcodeConstants.BLT, unknownInstruction);
-executeMap.set(FullOpcodeConstants.BGE, unknownInstruction);
-executeMap.set(FullOpcodeConstants.BLTU, unknownInstruction);
-executeMap.set(FullOpcodeConstants.BGEU, unknownInstruction);
+executeMap.set(FullOpcodeConstants.BEQ, beq);
+executeMap.set(FullOpcodeConstants.BNE, bne);
+executeMap.set(FullOpcodeConstants.BLT, blt);
+executeMap.set(FullOpcodeConstants.BLTU, bltu);
+executeMap.set(FullOpcodeConstants.BGE, bge);
+executeMap.set(FullOpcodeConstants.BGEU, bgeu);
 executeMap.set(FullOpcodeConstants.LB, unknownInstruction);
 executeMap.set(FullOpcodeConstants.LH, unknownInstruction);
 executeMap.set(FullOpcodeConstants.LW, lw);
@@ -216,6 +216,88 @@ function srai(pc: number, decodedInstruction: DecodedInstruction): ExecutionResu
     result: decodedInstruction.firstRegisterValue >> decodedInstruction.immediate
   };
 }
+
+function beq(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  if (decodedInstruction.firstRegisterValue === decodedInstruction.secondRegisterValue) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
+function bne(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  if (decodedInstruction.firstRegisterValue !== decodedInstruction.secondRegisterValue) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
+function blt(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  const less = setLessThan(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue);
+
+  if (less === 1) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
+function bltu(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  const less = setLessThanUnsigned(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue);
+
+  if (less === 1) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
+function bge(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  const less = setLessThan(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue);
+
+  if (less === 0) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
+function bgeu(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
+  let result: ExecutionResult = {
+    result: pc + 4,
+  };
+
+  const less = setLessThanUnsigned(decodedInstruction.firstRegisterValue, decodedInstruction.secondRegisterValue);
+
+  if (less === 0) {
+    result.jumpTo = pc + decodedInstruction.immediate;
+  }
+
+  return result;
+}
+
 
 function truncateTo32(result: ExecutionResult): ExecutionResult {
   return {

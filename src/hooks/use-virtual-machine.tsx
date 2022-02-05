@@ -2,7 +2,7 @@ import {assemble, AssemblerContext, AssemblerError} from '../virtual-machine/ris
 import {ProtoCore, CoreState} from '../virtual-machine/risc-v/cpu-cores/proto-core';
 import {MemoryRegion, MemoryRegionDump} from '../virtual-machine/risc-v/cpu-cores/peripherals/memory';
 import {IntermediateInstruction} from '../virtual-machine/risc-v/assembler/intermediate-types';
-import {useRef, useState} from 'react';
+import {useState} from 'react';
 
 const programMemory: MemoryRegion = {
   regionName: 'program',
@@ -39,6 +39,7 @@ export interface ConsoleLine {
 export interface VMState {
   coreState: CoreState;
   fetchedInstructionContext?: IntermediateInstruction;
+  currentInstructionContext?: IntermediateInstruction;
   programDump: MemoryRegionDump;
   ramDump: MemoryRegionDump;
   consoleBuffer: ConsoleLine[];
@@ -83,24 +84,31 @@ export class VM {
     })
   }
 
+  getIntermediateInstruction(address: number): IntermediateInstruction | undefined {
+    const intermediate = this.assemblerCtx?.programMap.get(address);
+
+    if (!intermediate) {
+      this.setConsoleMessage(`Can't find intermediate at address: ${address.toString(16).padStart(8, '0')}`);
+    }
+
+    return intermediate;
+  }
+
   getState(): VMState {
     const coreState = this.core.getState();
+    const currentAddress = this.core.getState().programCounter;
 
     let fetchedInstructionContext = undefined;
     if (coreState.pipelineState === 'decode') {
-      const currentAddress = this.core.getState().programCounter;
-      const intermediate = this.assemblerCtx?.programMap.get(currentAddress);
-
-      if (!intermediate) {
-        this.setConsoleMessage(`Can't find intermediate at address: ${currentAddress.toString(16).padStart(8, '0')}`);
-      } else {
-        fetchedInstructionContext = intermediate;
-      }
+      fetchedInstructionContext = this.getIntermediateInstruction(currentAddress);
     }
+
+    let currentInstruction = this.getIntermediateInstruction(currentAddress);
 
     return {
       coreState: this.core.getState(),
       fetchedInstructionContext,
+      currentInstructionContext: currentInstruction,
       ramDump: this.core.memoryController.getRegionDump('ram'),
       programDump: this.core.memoryController.getRegionDump('program'),
       consoleBuffer: this.consoleBuffer,
@@ -156,7 +164,6 @@ export function useVirtualMachine(): VMHook {
       throw new Error(msg);
     }
 
-    let tries = 0;
     do {
       vm.tick()
     } while (vm.getState().coreState.pipelineState !== 'fetch' && !vm.getState().error);
