@@ -4,7 +4,9 @@ import styles from './AssemblyEditorCM.module.css';
 import {PanelHeader} from '../../layout/PanelHeader';
 import Panel from '../../layout/Panel';
 import {AssemblySetup} from './code-mirror-setup';
-import {AssemblyTheme} from './code-mirror-theme';
+import {assemblyHighlightStyle, AssemblyTheme} from './code-mirror-theme';
+import {StreamLanguage} from '@codemirror/stream-parser';
+import {gas} from '@codemirror/legacy-modes/mode/gas';
 
 export interface AssemblyEditorCMProps {
   initialProgram: string;
@@ -20,7 +22,7 @@ export default function AssemblyEditorCM(props: AssemblyEditorCMProps) {
     value: initialProgram,
     basicSetup: false,
     theme: AssemblyTheme,
-    extensions: [AssemblySetup],
+    extensions: [AssemblySetup, assemblyHighlightStyle, StreamLanguage.define(gas)],
     onChange: (value) => { onChange(value); }
   });
 

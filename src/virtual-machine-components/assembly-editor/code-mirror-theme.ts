@@ -1,5 +1,6 @@
 import {EditorView} from '@codemirror/view';
 import {backgroundColorHex, primaryColorDarkHex, primaryColorHex, primaryColorLightHex} from '../../theme';
+import {tags, HighlightStyle} from "@codemirror/highlight"
 
 export const AssemblyTheme = EditorView.theme(
   {
@@ -42,3 +43,10 @@ export const AssemblyTheme = EditorView.theme(
     dark: true
   }
 )
+
+
+export const assemblyHighlightStyle = HighlightStyle.define([
+  {tag: tags.typeName, color: primaryColorHex},
+  {tag: tags.keyword, color: primaryColorLightHex},
+  {tag: tags.comment, color: primaryColorDarkHex }
+])
