@@ -19,9 +19,9 @@
     outline-offset: -2px;
 
     transition:
-            outline 250ms ease-in-out,
-            background 250ms ease-in-out,
-            color 250ms ease-in-out;
+            outline 100ms ease-in-out,
+            background 100ms ease-in-out,
+            color 100ms ease-in-out;
     position: relative;
 }
 
