@@ -3,19 +3,19 @@
     color: var(--primary-color);
 }
 
-.state-content {
+.stateContent {
     display: grid;
     grid-template-columns: 1fr 1fr;
     width: fit-content;
     gap: 0.5rem;
 }
 
-.pipeline-state {
+.pipelineState {
     display: flex;
     flex-direction: column;
 }
 
-.state-panel-content {
+.statePanelContent {
     padding: 0.5rem;
     color: var(--primary-color-light);
 
@@ -23,13 +23,13 @@
     line-height: 1.4;
 }
 
-.state-memory-col {
+.stateMemoryCol {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-.region-dump-content {
+.regionDumpContent {
     padding: 0.5rem;
     color: var(--primary-color-light);
 
@@ -40,46 +40,62 @@
     overflow: auto;
 }
 
-.region-dump-line {
+.regionDumpLine {
     display: flex;
     gap: 0.5rem;
     padding-left: 0.25rem;
 }
 
-.region-dump-separator {
+.regionDumpSeparator {
     width: 0.1rem;
     background: var(--primary-color-dark);
 }
 
-.region-dump-word-line {
+.regionDumpWordLine {
     display: flex;
     gap: 0.5rem;
 }
 
-.region-dump-word-highlight {
+.regionDumpWordHighlight {
     background: var(--primary-color-light);
     color: var(--background-color);
 }
 
-.region-dump-word {
+.regionDumpWord {
     display: flex;
     gap: 0.5rem;
     padding: 0 0.25rem;
 }
 
-.register-dump-content {
+.registerDumpContent {
     display: grid;
     grid-template-rows: repeat(8, 1fr);
     grid-auto-flow: column;
     column-gap: 1rem;
 }
 
-.register-dump-line {
+.registerDumpLine {
     display: flex;
     gap: 0.5rem;
 }
 
-.register-dump-separator {
+.registerDumpSeparator {
     width: 0.1rem;
     background: var(--primary-color-dark);
+}
+
+.cpuState {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-evenly;
+}
+
+.cpuStateItem {
+    padding: 0.25rem 1rem;
+    border: 1px solid var(--primary-color-light)
+}
+
+.cpuStateActive {
+    color: var(--background-color);
+    background: var(--primary-color-light);
 }

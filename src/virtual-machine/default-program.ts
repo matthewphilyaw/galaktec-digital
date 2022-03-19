@@ -37,7 +37,7 @@ export const sampleProgram =
   'store:\n' +
   '    # Push ra on  the stack.\n' +
   '    addi sp, -4(sp)\n' +
-  '	sw ra, 0(sp)\n' +
+  '    sw ra, 0(sp)\n' +
   '\n' +
   '\n' +
   '    # Store function arg (a1) into ram.\n' +
@@ -52,7 +52,7 @@ export const sampleProgram =
   'add_routine:\n' +
   '    # Push ra on the stack.\n' +
   '    addi sp, -4(sp)\n' +
-  '	   sw ra, 0(sp)\n' +
+  '    sw ra, 0(sp)\n' +
   '\n' +
   '	   # Take increment stored in RAM @ 0x90\n' +
   '    # and always add 11 to it.\n' +

@@ -21,6 +21,14 @@ interface RegisterLine {
   value: string;
 }
 
+const stateLabelMap: Record<string, string> = {
+  'fetch': 'Fetch',
+  'decode': 'Decode',
+  'execute': 'Execute',
+  'memory-access': 'Memory access',
+  'write-back': 'Write back'
+}
+
 function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[], wordsPerRow?: number): FormattedMemoryLine[] {
   const addrLines: FormattedMemoryLine[] = [];
 
@@ -83,10 +91,26 @@ function formatRegisterValues(registers: number[]): RegisterLine[] {
 function PipelineState(props: VMStateBlockProps) {
   const { vmState } = props;
 
+  const states = [
+    'Fetch',
+    'Decode',
+    'Execute',
+    'Memory access',
+    'Write back'
+  ]
+
   return (
-    <div className={styles['pipeline-state']}>
+    <div className={styles.pipelineState}>
       <Panel headerContent={<PanelHeader text={"CPU State"} />}>
-        <div className={styles['state-panel-content']}>
+        <div className={styles.statePanelContent}>
+          <div className={styles.cpuState}>
+            { Object.keys(stateLabelMap).map(state => {
+              return (
+              <div className={[styles.cpuStateItem, state === vmState.coreState.pipelineState ? styles.cpuStateActive : ''].join(' ')}>
+                {stateLabelMap[state]}
+              </div>
+            )}) }
+          </div>
           <div>PC: {vmState.coreState.programCounter.toString(16).padStart(8, '0')}</div>
           <div>Fetched Instr: {vmState.coreState.fetchedInstruction.toString(16).padStart(8, '0')}</div>
           <div>Formatted Instr:</div>
@@ -111,17 +135,17 @@ function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: numb
 
   return (
     <Panel headerContent={<PanelHeader text={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes)`} />}>
-      <div className={styles["region-dump-content"]}>
+      <div className={styles.regionDumpContent}>
         {formattedMemory.map((line) => {
           return (
-            <div className={styles['region-dump-line']} key={line.address}>
-              <div className={styles['region-dump-address']}>{line.address}</div>
-              <div className={styles['region-dump-separator']}></div>
-              <div className={styles['region-dump-word-line']}>
+            <div className={styles.regionDumpLine} key={line.address}>
+              <div className={styles.regionDumpAddress}>{line.address}</div>
+              <div className={styles.regionDumpSeparator}></div>
+              <div className={styles.regionDumpWordLine}>
               {line.words.map((word) => {
                 return (
-                  <div className={[styles['region-dump-word'], word.highlight ? styles['region-dump-word-highlight'] : ''].join(' ')}>
-                    {word.value.map((byte, i) => <div className={styles['region-dump-value-byte']} key={i}>{byte}</div>)}
+                  <div className={[styles.regionDumpWord, word.highlight ? styles.regionDumpWordHighlight : ''].join(' ')}>
+                    {word.value.map((byte, i) => <div className={styles.regionDumpValueByte} key={i}>{byte}</div>)}
                   </div>
                 )
               })}
@@ -140,13 +164,13 @@ function RegisterDump(props: { registers: number[]}) {
 
   return (
     <Panel headerContent={<PanelHeader text={"Registers"} />}>
-      <div className={[styles['state-panel-content'], styles["register-dump-content"]].join(' ')}>
+      <div className={[styles.statePanelContent, styles.registerDumpContent].join(' ')}>
         {formattedRegisters.map((line) =>
-          <div className={styles['register-dump-line']} key={line.name}>
-            {line.index < 10 && <div className={styles['register-dump-register']}>&nbsp;{line.name}</div> }
-            {line.index >= 10 && <div className={styles['register-dump-register']}>{line.name}</div> }
-            <div className={styles['register-dump-separator']}></div>
-            <div className={styles['register-dump-value']}>{line.value}</div>
+          <div className={styles.registerDumpLine} key={line.name}>
+            {line.index < 10 && <div className={styles.registerDumpRegister}>&nbsp;{line.name}</div> }
+            {line.index >= 10 && <div className={styles.registerDumpRegister}>{line.name}</div> }
+            <div className={styles.registerDumpSeparator}></div>
+            <div className={styles.registerDumpValue}>{line.value}</div>
           </div>
         )}
       </div>
@@ -162,8 +186,8 @@ export function VMStateBlock(props: VMStateBlockProps) {
   const { vmState } = props;
 
   return (
-    <div className={styles['state-content']}>
-      <div className={styles['state-memory-col']}>
+    <div className={styles.stateContent}>
+      <div className={styles.stateMemoryCol}>
         <RegisterDump registers={vmState.coreState.registers}/>
         <RegionDump region={vmState.programDump} highlightAddresses={[vmState.coreState.programCounter]}  wordsPerRow={4}/>
         <RegionDump region={vmState.ramDump} wordsPerRow={4} />
