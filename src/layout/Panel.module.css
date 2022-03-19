@@ -6,6 +6,7 @@
 
 .barHeader {
     background: var(--panel-header-background-color);
+    color: var(--panel-header-color);
     height: auto;
     border: var(--panel-header-border-thickness) solid var(--panel-header-border-color);
     border-bottom-color: var(--panel-header-border-color-highlight);

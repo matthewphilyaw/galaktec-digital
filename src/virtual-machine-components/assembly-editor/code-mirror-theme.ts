@@ -46,7 +46,6 @@ export const AssemblyTheme = EditorView.theme(
 
 
 export const assemblyHighlightStyle = HighlightStyle.define([
-  {tag: tags.typeName, color: primaryColorHex},
-  {tag: tags.keyword, color: primaryColorLightHex},
+  {tag: [tags.typeName, tags.keyword], color: primaryColorLightHex},
   {tag: tags.comment, color: primaryColorDarkHex }
 ])

@@ -10,17 +10,18 @@ h1, h2, h3, h4, h5 {
 }
 
 html {
-  --background-color: #120902;
-  --primary-color: #E98335;
-  --primary-color-dark: #6E370C;
-  --primary-color-light: #EFA56C;
+  --background-color: #050F05;
+  --primary-color: #02CA02;
+  --primary-color-dark: #156515;
+  --primary-color-light: #66FF66;
 
   --panel-header-height: 2rem;
-  --panel-header-background-color: var(--background-color);
+  --panel-header-color: var(--background-color);
+  --panel-header-background-color: var(--primary-color-light);
   --panel-header-border-thickness: 1px;
-  --panel-header-border-color: var(--primary-color-dark);
-  --panel-header-border-color-highlight: var(--primary-color);
-  --panel-header-border-radius: 0.5rem;
+  --panel-header-border-color: var(--primary-color-light);
+  --panel-header-border-color-highlight: var(--primary-color-dark);
+  --panel-header-border-radius: 0;
   --panel-content-background-color: var(--background-color);
 
   height: calc(100vh - 4px);
@@ -60,7 +61,7 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--primary-color);
+  background-color: var(--primary-color-light);
 }
 
 .material-icons-outlined.md-18 { font-size: 18px; }

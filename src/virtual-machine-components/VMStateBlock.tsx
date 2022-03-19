@@ -97,11 +97,11 @@ function PipelineState(props: VMStateBlockProps) {
     'Execute',
     'Memory access',
     'Write back'
-  ]
+  ];
 
   return (
     <div className={styles.pipelineState}>
-      <Panel headerContent={<PanelHeader text={"CPU State"} />}>
+      <Panel headerContent={<PanelHeader text={"Pipeline state"} />}>
         <div className={styles.statePanelContent}>
           <div className={styles.cpuState}>
             { Object.keys(stateLabelMap).map(state => {
@@ -111,22 +111,30 @@ function PipelineState(props: VMStateBlockProps) {
               </div>
             )}) }
           </div>
-          <div>PC: {vmState.coreState.programCounter.toString(16).padStart(8, '0')}</div>
+        </div>
+      </Panel>
+      <Panel headerContent={<PanelHeader text={"Program Counter"} />}>
+        <div className={styles.statePanelContent}>
+          {vmState.coreState.programCounter.toString(16).padStart(8, '0')}
+        </div>
+      </Panel>
+      <Panel headerContent={<PanelHeader text={"Debug"} />}>
+        <div className={styles.statePanelContent}>
           <div>Fetched Instr: {vmState.coreState.fetchedInstruction.toString(16).padStart(8, '0')}</div>
           <div>Formatted Instr:</div>
           <div>&emsp;Type: {vmState.fetchedInstructionContext?.instructionFormatType}</div>
           <div>&emsp;Instr: {vmState.fetchedInstructionContext?.formattedEncodedInstructions}</div>
-          <div>Full opcode: {vmState.coreState.decodedInstruction?.fullOpcode}</div>
-          <div>Reg 1: {vmState.coreState.decodedInstruction?.firstRegisterValue}</div>
-          <div>Reg 2: {vmState.coreState.decodedInstruction?.secondRegisterValue}</div>
-          <div>Imm :{vmState.coreState.decodedInstruction?.immediate}</div>
+          <div>Full opcode: {vmState.coreState.decodedInstruction?.fullOpcode.toString(16).padStart(8, '0')}</div>
+          <div>Reg 1: {vmState.coreState.decodedInstruction?.firstRegisterValue.toString(16).padStart(8, '0')}</div>
+          <div>Reg 2: {vmState.coreState.decodedInstruction?.secondRegisterValue.toString(16).padStart(8, '0')}</div>
+          <div>Imm: {vmState.coreState.decodedInstruction?.immediate ? (vmState.coreState.decodedInstruction.immediate >>> 0).toString(16).padStart(8, '0') : 0}</div>
           <div>Destination Reg: {vmState.coreState.decodedInstruction?.destinationRegisterIndex}</div>
-          <div>Alu Result: {vmState.coreState.ALUResult}</div>
-          <div>Access Result: {vmState.coreState.memoryAccessResult}</div>
+          <div>Alu Result: {(vmState.coreState.ALUResult >>> 0).toString(16).padStart(8, '0')}</div>
+          <div>Access Result: {(vmState.coreState.memoryAccessResult >>> 0).toString(16).padStart(8, '0')}</div>
         </div>
       </Panel>
     </div>
-  )
+  );
 }
 
 function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: number[], wordsPerRow?: number}) {
@@ -134,7 +142,7 @@ function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: numb
   const formattedMemory = formatMemoryDump(region, highlightAddresses, wordsPerRow);
 
   return (
-    <Panel headerContent={<PanelHeader text={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes)`} />}>
+    <Panel headerContent={<PanelHeader text={`${region.regionInfo.regionName} | ${region.regionInfo.lengthInBytes} (bytes | little endian)`} />}>
       <div className={styles.regionDumpContent}>
         {formattedMemory.map((line) => {
           return (
@@ -155,7 +163,7 @@ function RegionDump(props: { region: MemoryRegionDump, highlightAddresses?: numb
         })}
       </div>
     </Panel>
-  )
+  );
 }
 
 function RegisterDump(props: { registers: number[]}) {
@@ -175,7 +183,7 @@ function RegisterDump(props: { registers: number[]}) {
         )}
       </div>
     </Panel>
-  )
+  );
 }
 
 export interface VMStateBlockProps {

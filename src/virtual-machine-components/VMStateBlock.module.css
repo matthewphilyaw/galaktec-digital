@@ -13,6 +13,7 @@
 .pipelineState {
     display: flex;
     flex-direction: column;
+    gap: 0.5rem;
 }
 
 .statePanelContent {
@@ -92,7 +93,9 @@
 
 .cpuStateItem {
     padding: 0.25rem 1rem;
-    border: 1px solid var(--primary-color-light)
+    border: 1px solid var(--primary-color-light);
+    display: flex;
+    align-items: center;
 }
 
 .cpuStateActive {

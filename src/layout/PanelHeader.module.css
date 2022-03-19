@@ -1,6 +1,6 @@
 
 .container {
-    color: var(--primary-color-light);
+    color: var(--panel-header-color);
     font-weight: 500;
     width: 100%;
     height: 100%;
