@@ -1,29 +1,18 @@
-import {Button, ButtonProps} from './Button';
+import {LayoutOrientation} from './utils';
+import Button, {ButtonProps} from './Button';
 import styles from './ButtonGroup.module.css';
 
-export interface Buttons {
-  icon?: string;
-  text?: string;
-  onClick?: () => void;
-}
+export type ButtonGroupButton = Omit<ButtonProps, 'layoutOrientation'>;
 
 export interface ButtonGroupProps {
-  buttons: Buttons[];
-  size: 'small' | 'medium';
+  layoutOrientation?: LayoutOrientation;
+  buttons: ButtonGroupButton[];
 }
 
-export function ButtonGroup(props: ButtonGroupProps) {
-  const { buttons, size } = props;
-
+export default function ButtonGroup({ layoutOrientation = 'horizontal', buttons }: ButtonGroupProps) {
   return (
-    <div className={styles.buttonGroup}>
-      { buttons.map(b => {
-          return (
-            <Button icon={b.icon} text={b.text} onClick={b.onClick} size={ size } />
-          )
-        })
-      }
+    <div className={`${styles.group} ${styles[layoutOrientation]}`}>
+      {buttons.map(({text, click }) => <Button key={text} text={text} click={click} layoutOrientation={layoutOrientation} />)}
     </div>
   );
 }
-

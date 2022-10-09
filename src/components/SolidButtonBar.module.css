@@ -1,0 +1,47 @@
+.content {
+    --plate-background-color: var(--primary-color);
+    --plate-color: var(5--background-color);
+    --plate-border-radius: 0 10px 10px 0;
+    --plate-box-shadow: 0 0 15px 2px black;
+    --plate-screw-diameter: 1rem;
+    --plate-screw-primary-color: var(--primary-color-dark);
+    --plate-screw-accent-color: var(--background-color-light);
+
+
+    --button-background: var(--background-color);
+    --button-color: var(--primary-color);
+    --button-font-size: 0.75rem;
+    --button-border: 2px solid var(--alternate-background-color);
+
+    --button-hover-border: 2px solid var(--alternate-background-color);
+    --button-hover-background: var(--primary-color);
+    --button-hover-color: var(--background-color);
+
+    --button-active-border: 2px solid var(--alternate-background-color);
+    --button-active-background: var(--accent-color);
+    --button-active-color: white;
+
+    --button-group-gap: 0.5rem;
+
+    box-sizing: border-box;
+}
+
+.content.top {
+    --plate-border-radius: 10px 10px 0 0;
+    --button-radius: 10px 10px 0 0;
+}
+
+.content.bottom {
+    --plate-border-radius: 0 0 10px 10px;
+    --button-radius: 0 0 10px 10px;
+}
+
+.content.left {
+    --plate-border-radius: 0 10px 10px 0;
+    --button-radius: 0 10px 10px 0;
+}
+
+.content.right {
+    --plate-border-radius: 10px 0 0 10px;
+    --button-radius: 10px 0 0 10px;
+}

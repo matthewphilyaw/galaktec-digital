@@ -1,28 +1,16 @@
 import styles from './Button.module.css';
+import {LayoutOrientation} from './utils';
 
 export interface ButtonProps {
-  icon?: string;
-  text?: string;
-  onClick?: () => void;
-  size?: 'small' | 'medium';
+  text: string;
+  click: () => void;
+  layoutOrientation?: LayoutOrientation;
 }
 
-export function Button(props: ButtonProps) {
-  const { icon, text, onClick } = props;
-  let size = props.size;
-
-  if (!size) {
-    size = 'medium';
-  }
-
+export default function Button({ text, click, layoutOrientation = 'horizontal'}: ButtonProps) {
   return (
-    <button className={ styles.button } onClick={onClick}>
-      { icon &&
-      <span className={ ['material-icons-outlined', (size === 'small' ? 'md-18' : 'md-24') ].join(' ')}>{icon}</span>
-      }
-      { text &&
-      <span className={ size === 'small' ? styles.buttonTextSmall : styles.buttonTextMedium }>{text}</span>
-      }
+    <button className={`${styles.button} ${styles[layoutOrientation]}`} onClick={click}>
+      <span>{text}</span>
     </button>
-  )
+  );
 }

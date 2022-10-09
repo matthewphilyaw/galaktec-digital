@@ -1,6 +1,19 @@
 
-.buttonGroup {
+.group {
+    box-sizing: border-box;
     display: flex;
-    justify-content: space-evenly;
-    gap: 0.5rem;
+    gap: var(--button-group-gap, 0.25rem);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+.group.horizontal {
+    padding: var(--button-group-padding) 0;
+}
+
+.group.vertical {
+    padding: 0 var(--button-group-padding);
+    flex-direction: column;
 }
