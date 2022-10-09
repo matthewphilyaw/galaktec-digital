@@ -1,25 +1,8 @@
 import {MemoryController, MemoryRegion} from './peripherals/memory';
-import { FullOpcodeConstants, OpcodeGroupsConstants } from '@/virtual-machine/risc-v/cpu-cores/opcode';
-
-enum InstructionFormat {
-  R,
-  I,
-  S,
-  B,
-  U,
-  J
-}
-
-class DecodedInstruction {
-  constructor(
-    public instructionFormat: InstructionFormat,
-    public fullOpcode: number, // combines opcode, func3 and func7 for  easy comparison
-    public destinationRegisterIndex: number,
-    public firstRegisterValue: number,
-    public secondRegisterValue: number,
-    public immediate: number
-  ) {}
-}
+import {FullOpcodeConstants, OpcodeGroupsConstants} from './opcode';
+import {signExtend, unsignedValue} from '../../utils/bit-manipulation';
+import {DecodedInstruction, InstructionFormat} from './decoded-instruction';
+import {executeInstruction, ExecutionResult} from './stages/execute-instruction';
 
 export interface CoreState {
   pipelineState:  'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
@@ -35,29 +18,22 @@ export interface CoreState {
 export class ProtoCore {
   public  memoryController: MemoryController;
   private pc: number;
-  private nextPc: number;
   private registers: number[] = new Array(32).fill(0);
 
   private instruction: number;
   private decodedInstruction?: DecodedInstruction;
-  private executionResult: number;
+  private executionResult?: ExecutionResult;
   private memoryAccessResult: number;
 
   private state: 'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
 
-  private jump: boolean;
-
   constructor(memoryController: MemoryRegion[]) {
     this.memoryController = new MemoryController(memoryController);
     this.pc = 0;
-    this.nextPc = 0;
     this.state = 'fetch';
 
     this.instruction = 0;
-    this.executionResult = 0;
     this.memoryAccessResult = 0;
-
-    this.jump = false;
   }
 
   loadProgram(programBuffer: ArrayBuffer): void {
@@ -75,7 +51,7 @@ export class ProtoCore {
       programCounter: this.pc,
       fetchedInstruction: this.instruction,
       decodedInstruction: this.decodedInstruction,
-      ALUResult: this.executionResult,
+      ALUResult: this.executionResult?.result ?? 0,
       memoryAccessResult: this.memoryAccessResult,
       registers: this.registers
     };
@@ -92,7 +68,7 @@ export class ProtoCore {
         this.state = 'execute';
         break;
       case 'execute':
-        this.execute();
+        this.executionResult = executeInstruction(this.pc, this.decodedInstruction!);
         this.state = 'memory-access';
         break;
       case 'memory-access':
@@ -105,15 +81,15 @@ export class ProtoCore {
 
         this.instruction = 0;
         this.decodedInstruction = undefined;
-        this.executionResult = 0;
         this.memoryAccessResult = 0;
 
-        if (!this.jump) {
+        if (this.executionResult?.jumpTo === undefined) {
           this.pc += 4;
         } else {
-          this.pc = this.nextPc;
-          this.jump = false;
+          this.pc = this.executionResult.jumpTo;
         }
+
+        this.executionResult = undefined;
         break;
       default:
         throw new Error('Invalid state');
@@ -139,10 +115,28 @@ export class ProtoCore {
     let immediate = 0;
 
     switch (opcode) {
+      case OpcodeGroupsConstants.ALU_IMMEDIATE:{
+        let fullOpCode;
+        if (funct3 === 0b101) {
+          fullOpCode = (funct7 << 10) | (funct3 << 7) | opcode;
+        } else {
+          fullOpCode = (funct3 << 7) | opcode;
+        }
+
+        immediate = signExtend((instruction >>> 20), 12);
+        decoded = new DecodedInstruction(
+          InstructionFormat.I,
+          fullOpCode,
+          rd,
+          r1 === 0 ? 0 : this.registers[r1],
+          0,
+          immediate
+        );
+        break;
+      }
       case OpcodeGroupsConstants.JALR:
-      case OpcodeGroupsConstants.ALU_IMMEDIATE:
       case OpcodeGroupsConstants.LOAD:
-        immediate = (((instruction >>> 20) & 0xfff) << 20) >> 20;
+        immediate = signExtend((instruction >>> 20), 12);
         decoded = new DecodedInstruction(
           InstructionFormat.I,
           (funct3 << 7) | opcode,
@@ -153,6 +147,16 @@ export class ProtoCore {
         );
         break;
       case OpcodeGroupsConstants.BRANCHING:
+        const imm12 = ((funct7 >>> 6) << 11) | ((rd & 0x1) << 10) | ((funct7 & 0x3f) << 4) | ((rd & 0x1e) >>> 1 );
+        decoded = new DecodedInstruction(
+          InstructionFormat.B,
+          (funct3 << 7) | opcode,
+          0,
+          r1 === 0 ? 0 : this.registers[r1],
+          r2 === 0 ? 0 : this.registers[r2],
+          signExtend(imm12, 12)
+        );
+        break;
       case OpcodeGroupsConstants.STORE:
         immediate = (funct7 << 5) | rd;
         decoded = new DecodedInstruction(
@@ -161,7 +165,7 @@ export class ProtoCore {
           0,
           r1 === 0 ? 0 : this.registers[r1],
           r2 === 0 ? 0 : this.registers[r2],
-          immediate
+          signExtend(immediate, 12)
         );
         break;
       case OpcodeGroupsConstants.ALU:
@@ -182,7 +186,7 @@ export class ProtoCore {
 
         immediate = 0;
         immediate = (imm20 << 20) | (imm12to19 << 12) | (imm11 << 11) | (imm1to10 << 1);
-        immediate = (((immediate << 12) >> 12));
+        immediate = signExtend(immediate, 20);
 
         decoded = new DecodedInstruction(
           InstructionFormat.J,
@@ -216,79 +220,15 @@ export class ProtoCore {
     this.decodedInstruction = decoded;
   }
 
-  execute(): void {
-    const instruction = this.decodedInstruction!;
-
-    switch (instruction.fullOpcode) {
-      case FullOpcodeConstants.SW: // sw
-      case FullOpcodeConstants.ADDI: // addi
-      case FullOpcodeConstants.LW: // lw
-        this.executionResult = instruction.firstRegisterValue + instruction.immediate;
-        break;
-      case FullOpcodeConstants.ADD: // add
-        this.executionResult = instruction.firstRegisterValue + instruction.secondRegisterValue;
-        break;
-      case FullOpcodeConstants.SLT:
-        if (instruction.firstRegisterValue < instruction.secondRegisterValue) {
-          this.executionResult = 1;
-        } else {
-          this.executionResult = 0;
-        }
-        break;
-      case FullOpcodeConstants.SLTU: {
-        const reg1UnsignedVal = instruction.firstRegisterValue >>> 0;
-        const reg2UnsignedVal = instruction.secondRegisterValue >>> 0;
-
-        if (reg1UnsignedVal === 0) {
-          if (reg2UnsignedVal !== reg1UnsignedVal) {
-            this.executionResult = 1;
-          } else {
-            this.executionResult = 0;
-          }
-
-        } else if (reg1UnsignedVal < reg2UnsignedVal) {
-          this.executionResult = 1;
-        }
-        else {
-          this.executionResult = 0;
-        }
-
-        break;
-      }
-      case FullOpcodeConstants.SUB:
-        this.executionResult = instruction.secondRegisterValue - instruction.firstRegisterValue;
-        break;
-      case FullOpcodeConstants.LUI:
-        this.executionResult = instruction.immediate;
-        break;
-      case FullOpcodeConstants.AUIPC:
-        this.executionResult = this.pc + instruction.immediate;
-        break;
-      case FullOpcodeConstants.JAL:
-        this.executionResult = this.pc + 4; // result is the return address PC + 4
-        this.nextPc = this.pc + instruction.immediate;
-        this.jump = true;
-        break;
-      case FullOpcodeConstants.JALR:
-        this.executionResult = this.pc + 4; // result is the return address PC + 4
-        this.nextPc = (instruction.firstRegisterValue + instruction.immediate) & 0xFFFF_FFFE;
-        this.jump = true;
-        break;
-      default:
-        throw new Error('unknown instruction');
-    }
-
-  }
-
   accessMemory(): void {
-    const opcode = this.decodedInstruction!.fullOpcode & 0x3f;
+    const opcode = this.decodedInstruction!.fullOpcode & 0x7f;
     // If no memory operation is needed then forward the value in execution along
     if (opcode !== OpcodeGroupsConstants.LOAD && opcode !== OpcodeGroupsConstants.STORE) {
-      this.memoryAccessResult = this.executionResult;
+      this.memoryAccessResult = this.executionResult!.result;
       return;
     }
 
-    const address = this.executionResult;
+    const address = this.executionResult!.result;
     switch (this.decodedInstruction!.fullOpcode) {
       case FullOpcodeConstants.LW:
         // execution result will be a memory address

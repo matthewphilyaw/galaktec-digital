@@ -4,8 +4,8 @@ import * as ainst from '../assembler/instruction-assembler';
 import riscVGrammar from '../../grammar/risc-v-grammar';
 
 import { Grammar, Parser } from 'nearley';
-import { IntermediateInstruction, IntermediateLabel } from '@/virtual-machine/risc-v/assembler/intermediate-types';
-import { SymbolTable } from '@/virtual-machine/risc-v/assembler/symbol-table';
+import { IntermediateInstruction, IntermediateLabel } from './intermediate-types';
+import { SymbolTable } from './symbol-table';
 
 export class AssemblerError {
   constructor(

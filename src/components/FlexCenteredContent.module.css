@@ -1,0 +1,7 @@
+
+.centered {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    justify-content: center;
+}

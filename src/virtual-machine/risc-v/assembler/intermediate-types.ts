@@ -1,13 +1,12 @@
-import { Instruction, Label } from '@/virtual-machine/grammar/assembly-statements';
+import { Instruction, Label } from '../..//grammar/assembly-statements';
 import {
   encodeRType,
   R_TYPE_PATTERN,
   encodeIType,
   I_TYPE_PATTERN,
   encodeSType, S_TYPE_PATTERN, encodeBType, B_TYPE_PATTERN, encodeUType, U_TYPE_PATTERN, encodeJType, J_TYPE_PATTERN
-} from '@/virtual-machine/risc-v/assembler/instruction-type-encoder';
-import { binWord, Chunk } from '@/virtual-machine/utils/binary-string-formatter';
-import { REGISTER_MAP } from '@/virtual-machine/risc-v/assembler/resgisters';
+} from './instruction-type-encoder';
+import { binWord, Chunk } from '../../utils/binary-string-formatter';
 
 export type Intermediate = IntermediateLabel | IntermediateInstruction;
 

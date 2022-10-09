@@ -1,0 +1,37 @@
+.content {
+    display: grid;
+    grid-template-columns: 2px var(--editor-width) 6px auto auto;
+    box-sizing: border-box;
+}
+
+.sideNav {
+    padding-top: 3rem;
+}
+.spacer {
+    background: var(--primary-color);
+    height: 100%;
+}
+
+
+.vertSpacer {
+    box-sizing: border-box;
+    margin-left: 4px;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.widgetSpace {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    overflow: auto;
+
+    --widget-plate-background-color: transparent;
+    --widget-plate-color: var(--primary-color);
+    --widget-plate-radius: 5px 5px;
+    --widget-plate-border: 2px groove var(--alternate-background-color);
+    --widget-content-border-color: var(--alternate-background-color);
+    --widget-content-background: var(--accent-color) radial-gradient(var(--accent-color) 80%, var(--accent-color-light) 100%);
+    --widget-screw-primary-color: var(--background-color-light);
+    --widget-screw-accent-color: var(--alternate-background-color);
+}

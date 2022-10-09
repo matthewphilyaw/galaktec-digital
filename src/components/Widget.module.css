@@ -1,0 +1,46 @@
+.widget {
+    --plate-background-color: var(--widget-plate-background-color);
+    --plate-color: var(--widget-plate-color);
+    --plate-border-radius: var(--widget-plate-radius);
+    --plate-border: var(--widget-plate-border);
+    --plate-screw-primary-color: var(--widget-screw-primary-color, var(--widget-plate-color));
+    --plate-screw-accent-color: var(--widget-screw-accent-color, var(--widget-plate-background-color));
+
+    --header-height: var(--widget-header-height, 1.75rem);
+
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+}
+
+.headerPlate {
+    --plate-box-shadow: 0 2px 2px black;
+    min-height: var(--header-height);
+}
+
+.header {
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+}
+
+.header h4 {
+    height: var(--header-height);
+    font-weight: 500;
+}
+
+.footer {
+    --plate-box-shadow: 0 -2px 2px black;
+    min-height: var(--header-height);
+}
+
+.content {
+    margin: 0 0.125rem;
+    padding: 0.5rem;
+    border-left: 4px groove var(--widget-content-border-color);
+    border-right: 4px groove var(--widget-content-border-color);
+    background: var(--widget-content-background);
+}
