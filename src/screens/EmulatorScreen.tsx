@@ -4,13 +4,16 @@ import {sampleProgram} from '../virtual-machine/default-program';
 import {ContentSpacer} from '../components/ContentSpacer';
 import {SolidButtonBar} from '../components/SolidButtonBar';
 import Widget from '../components/Widget';
+import {useVirtualMachine} from '../hooks/use-virtual-machine';
 
 export default function EmulatorScreen() {
 
+  const { controls, vmState } = useVirtualMachine();
+
   const buttons = [
-    { text: 'LOAD', click: () => { } },
-    { text: 'RUN', click: () => { } },
-    { text: 'STEP', click: () => { } },
+    { text: 'LOAD', click: () => { controls.loadProgram(sampleProgram) } },
+    { text: 'RUN', click: controls.run },
+    { text: 'STEP', click: controls.step },
   ];
 
   return (
