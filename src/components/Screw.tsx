@@ -10,7 +10,6 @@ export default function Screw({ randomizeBrightnessPlusOrMinus }: ScrewProps) {
   const [brightness] = useState(createNewBrightnessValue(randomizeBrightnessPlusOrMinus));
 
   useEffect(() => {
-    console.log('running');
     if (!screw.current) {
       return;
     }

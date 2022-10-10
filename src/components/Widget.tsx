@@ -15,7 +15,11 @@ export default function Widget({ title, children }: WidgetProps) {
       <div className={styles.headerPlate}>
         <Plate>
           <FlexCenteredContent>
-            <H4>{title}</H4>
+            <div className={styles.centerPlate}>
+              <Plate>
+                <H4>{title}</H4>
+              </Plate>
+            </div>
           </FlexCenteredContent>
         </Plate>
       </div>

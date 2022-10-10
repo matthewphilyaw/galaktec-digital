@@ -22,15 +22,17 @@ export default function Console(props: ConsoleProps) {
   useEffect(scrollToLastLine, [vmState]);
 
   return (
-    <Widget title={'Console'}>
-      <div className={styles.content}>
-        { vmState.consoleBuffer.map(line => {
-          return (
-            <div key={line.id} className={styles.line}>&gt; {line.value}</div>
-          );
-        })}
-        <div ref={lastLineRef} />
-      </div>
-    </Widget>
+    <div className={styles.console}>
+      <Widget title={'Console'}>
+        <div className={styles.content}>
+          { vmState.consoleBuffer.map(line => {
+            return (
+              <div key={line.id} className={styles.line}>&gt; {line.value}</div>
+            );
+          })}
+          <div ref={lastLineRef} />
+        </div>
+      </Widget>
+    </div>
   );
 }

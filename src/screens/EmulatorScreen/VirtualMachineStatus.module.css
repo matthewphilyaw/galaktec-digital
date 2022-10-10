@@ -1,0 +1,44 @@
+.container {
+  padding: 1rem;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.space {
+  height: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+
+  --widget-plate-background-color: transparent;
+  --widget-plate-color: var(--primary-color);
+  --widget-plate-radius: 5px 5px;
+  --widget-plate-border: 2px groove var(--alternate-background-color);
+  --widget-content-border-color: var(--alternate-background-color);
+  --widget-content-background: var(--accent-color) radial-gradient(var(--accent-color) 80%, var(--accent-color-light) 100%);
+  --widget-screw-primary-color: var(--background-color-light);
+  --widget-screw-accent-color: var(--alternate-background-color);
+}
+
+.hart {
+  display: flex;
+  flex-direction: column;
+}
+
+.peripheralsWrapper {
+  min-height: 0;
+}
+
+.peripherals {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.peripherals .memory {
+  display: flex;
+  gap: 1rem
+}

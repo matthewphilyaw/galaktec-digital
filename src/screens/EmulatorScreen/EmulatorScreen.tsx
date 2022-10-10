@@ -4,10 +4,11 @@ import {sampleProgram} from '../../virtual-machine/default-program';
 import {ContentSpacer} from '../../components/ContentSpacer';
 import {SolidButtonBar} from '../../components/SolidButtonBar';
 import {useVirtualMachineContext} from '../../hooks/use-virtual-machine';
-import RegisterViewerWidget from './RegisterViewerWidget';
+import RegisterView from './HartViewer/RegisterView';
 import {useRef} from 'react';
 import MemoryViewerWidget from './MemoryViewerWidget';
 import Console from './Console';
+import VirtualMachineStatus from './VirtualMachineStatus';
 
 export default function EmulatorScreen() {
   const programRef = useRef(sampleProgram);
@@ -35,14 +36,7 @@ export default function EmulatorScreen() {
       <div className={styles.sideNav}>
         <SolidButtonBar layoutPosition={'left'} buttons={buttons}/>
       </div>
-      <div className={styles.widgetContainer}>
-        <div className={styles.widgetSpace}>
-          <MemoryViewerWidget title={'Program Memory'} region={vmState.programDump} wordsPerRow={2} highlightAddresses={[vmState.coreState.programCounter]} />
-          <MemoryViewerWidget title={'Random Access Memory'} region={vmState.ramDump} wordsPerRow={2} />
-          <RegisterViewerWidget registerValues={vmState?.coreState.registers} />
-          <Console vmState={vmState} />
-        </div>
-      </div>
+      <VirtualMachineStatus vmState={vmState} />
     </div>
   );
 }

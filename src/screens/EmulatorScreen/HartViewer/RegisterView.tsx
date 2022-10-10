@@ -1,5 +1,5 @@
-import styles from './RegisterViewerWidget.module.css';
-import Widget from '../../components/Widget';
+import styles from './RegisterView.module.css';
+import {H4} from '../../../components/Heading';
 
 interface RegisterLine {
   index: number;
@@ -50,14 +50,14 @@ const registerLookup: Record<number, { name: string, aliases: string[] }> = {
 function formatRegisterValues(registers: number[]): RegisterLine[] {
   return registers.map((v, i) => {
     let value = '';
-    value = (v >>> 0).toString(16).padStart(8, '0');
-    /*
-    if (v > 9999999) {
+    if (Math.abs(v) > 9999999) {
+      value = (v >>> 0).toString(16).padStart(8, '0');
     }
     else {
       value = v.toString().padStart(8, ' ');
     }
-     */
+    value = (v >>> 0).toString(16).padStart(8, '0');
+
 
     return {
       index: i,
@@ -68,19 +68,16 @@ function formatRegisterValues(registers: number[]): RegisterLine[] {
   });
 }
 
-export default function RegisterViewerWidget({ registerValues }: RegisterViewerWidgetProps) {
+export default function RegisterView({ registerValues }: RegisterViewerWidgetProps) {
   const formattedRegisters = formatRegisterValues(registerValues);
   return (
-    <Widget title={`Registers`}>
-      <div className={styles['content']}>
-        {formattedRegisters.map((line) =>
-          <div className={styles['line']} key={line.name}>
-            <div className={styles['register']}>{line.name}|{(line.aliases.join(',')).padEnd(5, ' ')}</div>
-            <div className={styles['separator']} />
-            <div className={styles['value']}>{line.value}</div>
-          </div>
-        )}
-      </div>
-    </Widget>
+    <div className={styles['content']}>
+      {formattedRegisters.map((line) =>
+        <div className={styles['line']} key={line.name}>
+          <div className={styles['register']}>{line.name}|{(line.aliases.join(','))}</div>
+          <div className={styles['value']}>{line.value}</div>
+        </div>
+      )}
+    </div>
   );
 }

@@ -1,14 +1,13 @@
 .console {
-    color: var(--primary-color-light);
+    --widget-width: 100%;
 }
 
 .content {
-    height: 20ch;
+    height: 15ch;
     overflow: auto;
     font-family: 'Roboto Mono', 'sans-serif';
     font-weight: 300;
-    font-size: 1rem;
-    width: 60ch;
+    width: 100%;
 }
 
 .line {

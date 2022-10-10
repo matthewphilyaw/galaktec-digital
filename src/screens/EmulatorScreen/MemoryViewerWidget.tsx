@@ -80,9 +80,9 @@ export default function MemoryViewerWidget({ title, region, highlightAddresses, 
               <div className={styles.address}>{line.address}</div>
               <div className={styles.separator}></div>
               <div className={styles.wordLine}>
-                {line.words.map((word) => {
+                {line.words.map((word, i) => {
                   return (
-                    <div className={`${styles.word} ${word.highlight ? styles.wordHighlight : ''}`}>
+                    <div key={i} className={`${styles.word} ${word.highlight ? styles.wordHighlight : ''}`}>
                       {word.value.map((byte, i) => <div className={styles.valueByte} key={i}>{byte}</div>)}
                     </div>
                   )

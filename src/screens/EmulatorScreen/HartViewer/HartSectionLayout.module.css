@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    align-items: center;
+}
+
+.heading {
+    box-sizing: border-box;
+}
+
+.heading h4 {
+    font-family: 'Roboto', 'sans-serif';
+    font-weight: 400;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    writing-mode: vertical-lr;
+    text-orientation: upright;
+}
+
+.content {
+    box-sizing: border-box;
+}

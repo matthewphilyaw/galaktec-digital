@@ -19,6 +19,19 @@
     min-height: var(--header-height);
 }
 
+.centerPlate {
+    --plate-background-color: var(--primary-color);
+    --plate-color: var(--background-color);
+    --plate-screw-primary-color: var(--primary-color-dark);
+    --plate-screw-accent-color: var(--background-color-light);
+    --plate-box-shadow: 0 2px 2px black;
+    --plate-border-radius: 5px;
+    --plate-border: 0;
+    --plate-screw-diameter: 0.5rem;
+
+    min-height: var(--header-height);
+}
+
 .header {
     box-sizing: border-box;
     height: 100%;
