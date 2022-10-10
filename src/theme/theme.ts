@@ -45,7 +45,7 @@ export const colorsInHex: ThemeColors = {
   },
   accentColorLight: {
     cssKey: '--accent-color-light',
-    value: 'hsl(227, 100%, 18%)'
+    value: 'hsl(227, 100%, 30%)'
   },
   accentColor: {
     cssKey: '--accent-color',

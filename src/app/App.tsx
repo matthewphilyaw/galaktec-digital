@@ -1,9 +1,10 @@
 import {useEffect} from 'react';
 import styles from './App.module.css';
 import {colorsInHex, getListOfThemeColors} from '../theme/theme';
-import EmulatorScreen from '../screens/EmulatorScreen';
+import EmulatorScreen from '../screens/EmulatorScreen/EmulatorScreen';
 import AppHeader from './AppHeader';
 import AppSatusBar from './AppStatusBar';
+import {VirtualMachineProvider} from '../hooks/use-virtual-machine';
 
 
 export default function App() {
@@ -21,7 +22,9 @@ export default function App() {
   return (
     <div className={styles.App}>
       <AppHeader screenName={screenName} />
-      <EmulatorScreen />
+      <VirtualMachineProvider>
+        <EmulatorScreen />
+      </VirtualMachineProvider>
       <AppSatusBar />
     </div>
   );

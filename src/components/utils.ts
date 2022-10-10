@@ -5,9 +5,11 @@ export interface RandomizeBrightnessMixin {
   randomizeBrightnessPlusOrMinus?: number;
 }
 
-export function applyRandomBrightnessToElement(inLine: CSSStyleDeclaration, plusOrMinus: number) {
-  const brightness = Math.floor(Math.random() * (plusOrMinus * 2)) - plusOrMinus;
-  const brightnessValue = `brightness(${100 + brightness}%)`;
+export function createNewBrightnessValue(plusOrMinus?: number) {
+  if (!plusOrMinus) {
+    return null;
+  }
 
-  inLine.setProperty('filter', brightnessValue);
+  const brightness = Math.floor(Math.random() * (plusOrMinus * 2)) - plusOrMinus;
+  return `brightness(${100 + brightness}%)`;
 }

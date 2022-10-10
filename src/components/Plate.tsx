@@ -1,24 +1,16 @@
 import styles from './Plate.module.css'
 import Screw from './Screw';
 import {ReactNode, useEffect, useRef} from 'react';
-import {applyRandomBrightnessToElement, LayoutOrientation, RandomizeBrightnessMixin} from './utils';
+import {LayoutOrientation} from './utils';
 
-export interface HeaderPlateProps extends RandomizeBrightnessMixin {
+export interface HeaderPlateProps {
   children?: ReactNode;
   withScrews?: boolean;
   layoutOrientation?: LayoutOrientation;
 }
 
-export default function Plate({ children, withScrews = true, layoutOrientation = 'horizontal', randomizeBrightnessPlusOrMinus}: HeaderPlateProps) {
+export default function Plate({ children, withScrews = true, layoutOrientation = 'horizontal'}: HeaderPlateProps) {
   const plateRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (plateRef.current == null || !randomizeBrightnessPlusOrMinus) {
-      return;
-    }
-
-    applyRandomBrightnessToElement(plateRef.current.style, randomizeBrightnessPlusOrMinus);
-  }, [randomizeBrightnessPlusOrMinus])
 
   return (
     <div ref={plateRef} className={`${styles.plate} ${styles[layoutOrientation]} ${withScrews ? styles.withScrew : ''}`}>

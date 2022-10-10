@@ -1,0 +1,46 @@
+.content {
+    width: fit-content;
+    color: white;
+
+    font-family: 'Roboto Mono', 'sans-serif';
+    font-weight: 300;
+    line-height: 1;
+
+    min-height: 0;
+    height: 14rem;
+    overflow-y: auto;
+}
+
+.line {
+    display: flex;
+    gap: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+.separator {
+    width: 0.1rem;
+    background: var(--primary-color-dark);
+}
+
+.wordLine {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.wordHighlight {
+    background: white;
+    color: var(--accent-color-light);
+}
+
+.address {
+    display: flex;
+    align-items: center;
+}
+
+.word {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.25rem;
+}

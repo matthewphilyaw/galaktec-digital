@@ -22,7 +22,7 @@ export function SolidButtonBar({ layoutPosition, buttons }: SolidButtonBarProps)
 
   return (
     <div className={`${styles['content']} ${styles[layoutPosition]}`}>
-      <Plate layoutOrientation={layoutDirection} withScrews={true} randomizeBrightnessPlusOrMinus={10}>
+      <Plate layoutOrientation={layoutDirection} withScrews={true}>
         <ButtonGroup buttons={buttons} layoutOrientation={layoutDirection} />
       </Plate>
     </div>

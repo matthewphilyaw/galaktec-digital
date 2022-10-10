@@ -30,10 +30,11 @@ function func7(func7: number): number {
 }
 
 function immIType(imm: number): number {
-  return ((imm >>> 0) & IMM_12) << 20;
+  return (((imm >>> 0)) << 20) >>> 0;
 }
 
 function immUType(imm: number): number {
+  // TODO: look at this immediate value
   return ((imm >>> 0) & IMM_U20) << 12;
 }
 

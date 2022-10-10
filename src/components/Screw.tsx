@@ -1,23 +1,26 @@
 import styles from './Screw.module.css';
-import {useEffect, useRef} from 'react';
-import {applyRandomBrightnessToElement, RandomizeBrightnessMixin} from './utils';
+import {useEffect, useRef, useState} from 'react';
+import {createNewBrightnessValue, RandomizeBrightnessMixin} from './utils';
 
 export interface ScrewProps extends RandomizeBrightnessMixin { }
 
 export default function Screw({ randomizeBrightnessPlusOrMinus }: ScrewProps) {
   const screw = useRef<HTMLDivElement>(null);
+  const [rotation] = useState(Math.floor(Math.random() * 360));
+  const [brightness] = useState(createNewBrightnessValue(randomizeBrightnessPlusOrMinus));
 
   useEffect(() => {
-    if (!screw.current || !randomizeBrightnessPlusOrMinus) {
+    console.log('running');
+    if (!screw.current) {
       return;
     }
 
-    const rotation = Math.floor(Math.random() * 360);
-
     screw.current?.style.setProperty('--screw-rotation-degrees', `${rotation}deg`);
 
-    applyRandomBrightnessToElement(screw.current.style, randomizeBrightnessPlusOrMinus);
-  });
+    if (brightness) {
+      screw.current?.style.setProperty('filter', brightness);
+    }
+  }, [brightness, rotation]);
 
   return (
     <div ref={screw} className={styles.screw} />

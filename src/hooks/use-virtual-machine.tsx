@@ -1,140 +1,6 @@
-import {assemble, AssemblerContext, AssemblerError} from '../virtual-machine/risc-v/assembler/assembler';
-import {ProtoCore, CoreState} from '../virtual-machine/risc-v/cpu-cores/proto-core';
-import {MemoryRegion, MemoryRegionDump} from '../virtual-machine/risc-v/cpu-cores/peripherals/memory';
-import {IntermediateInstruction} from '../virtual-machine/risc-v/assembler/intermediate-types';
-import {useState} from 'react';
-
-const programMemory: MemoryRegion = {
-  regionName: 'program',
-  startAddress: 0x0,
-  lengthInBytes: 2048,
-  accessWidthInBytes: 1,
-  clockCyclesForWrite: 4,
-  clockCyclesForRead: 4,
-  readonly: false
-};
-
-// Yes I know Random Access Memory Memory...
-const ramMemory: MemoryRegion = {
-  regionName: 'ram',
-  startAddress: 0x800,
-  lengthInBytes: 1024,
-  accessWidthInBytes: 1,
-  clockCyclesForWrite: 1,
-  clockCyclesForRead: 1,
-  readonly: false
-};
-
-const protoMemoryLayout: MemoryRegion[] = [
-  programMemory,
-  ramMemory
-];
-
-let nextConsoleLineNumber = 0;
-export interface ConsoleLine {
-  id: number,
-  value: string
-}
-
-export interface VMState {
-  coreState: CoreState;
-  fetchedInstructionContext?: IntermediateInstruction;
-  currentInstructionContext?: IntermediateInstruction;
-  programDump: MemoryRegionDump;
-  ramDump: MemoryRegionDump;
-  consoleBuffer: ConsoleLine[];
-  error: Boolean;
-}
-
-export class VM {
-  private program: string;
-  private core: ProtoCore;
-  private assemblerCtx?: AssemblerContext;
-  private readonly consoleBuffer: ConsoleLine[];
-  private inErrorState: boolean;
-
-  constructor(program: string) {
-    this.program = program;
-    this.core = new ProtoCore(protoMemoryLayout);
-    this.consoleBuffer = [];
-    this.inErrorState = false;
-
-    try {
-      this.assemblerCtx = assemble(program, programMemory.lengthInBytes);
-      this.core.loadProgram(this.assemblerCtx.programMemoryBuffer);
-    } catch (error: unknown) {
-      if (error instanceof AssemblerError) {
-        this.setConsoleMessage(error.reason);
-      }
-      else if (error instanceof Error) {
-        this.setConsoleMessage(error.message);
-      }
-      else {
-        this.setConsoleMessage(JSON.stringify(error));
-      }
-
-      this.inErrorState = true;
-    }
-  }
-
-  setConsoleMessage(msg: string) {
-    this.consoleBuffer.push({
-      id: nextConsoleLineNumber++,
-      value: msg,
-    })
-  }
-
-  getIntermediateInstruction(address: number): IntermediateInstruction | undefined {
-    const intermediate = this.assemblerCtx?.programMap.get(address);
-
-    if (!intermediate) {
-      this.setConsoleMessage(`Can't find intermediate at address: ${address.toString(16).padStart(8, '0')}`);
-    }
-
-    return intermediate;
-  }
-
-  getState(): VMState {
-    const coreState = this.core.getState();
-    const currentAddress = this.core.getState().programCounter;
-
-    let fetchedInstructionContext = undefined;
-    if (coreState.pipelineState === 'decode') {
-      fetchedInstructionContext = this.getIntermediateInstruction(currentAddress);
-    }
-
-    let currentInstruction = this.getIntermediateInstruction(currentAddress);
-
-    return {
-      coreState: this.core.getState(),
-      fetchedInstructionContext,
-      currentInstructionContext: currentInstruction,
-      ramDump: this.core.memoryController.getRegionDump('ram'),
-      programDump: this.core.memoryController.getRegionDump('program'),
-      consoleBuffer: this.consoleBuffer,
-      error: this.inErrorState
-    }
-  }
-
-  tick() {
-    if (this.inErrorState) {
-      this.setConsoleMessage('VM is in an error state, must recreate VM.');
-    }
-
-    try {
-      this.core.tick();
-    } catch(error) {
-      if (error instanceof Error) {
-        this.setConsoleMessage(error.message);
-      }
-      else {
-        this.setConsoleMessage(JSON.stringify(error));
-      }
-
-      this.inErrorState = true;
-    }
-  }
-}
+import {VM, VMState} from './vm-wrapper';
+import {createContext, ReactNode, useContext, useRef, useState} from 'react';
+import {sampleProgram} from '../virtual-machine/default-program';
 
 export interface VMControls {
   loadProgram: (program: string) => void;
@@ -142,47 +8,64 @@ export interface VMControls {
   step: () => void;
 }
 
-export interface VMHook {
+export interface VMContext {
   vmState: VMState;
   controls: VMControls;
 }
 
-let vm = new VM('');
+export const VirtualMachineContext = createContext<VMContext>(null!);
 
-export function useVirtualMachine(): VMHook {
-  const [vmState, setVmState] = useState(vm.getState());
+export function useVirtualMachineContext() {
+  return useContext(VirtualMachineContext);
+}
+
+export interface VirtualMachineProviderProps {
+  children: ReactNode;
+}
+
+export function VirtualMachineProvider({ children }: VirtualMachineProviderProps) {
+  const vmRef = useRef(new VM(''));
+  const [vmState, setVmState] = useState<VMState>(vmRef.current.getState());
 
   function loadProgram(program: string) {
-    vm = new VM(program);
+    const vm = new VM(program);
+    vmRef.current = vm;
+
     setVmState(vm.getState());
   }
 
   function run() {
+    const vm = vmRef.current;
+
     if (!vm) {
       const msg = 'VM has not be initialized.';
       console.log(msg);
       throw new Error(msg);
     }
 
+    let lastEventId = vmState!.lastEventId;
     do {
-      vm.tick()
+      lastEventId++;
+      vm.tick(lastEventId);
     } while (vm.getState().coreState.pipelineState !== 'fetch' && !vm.getState().error);
 
     setVmState(vm.getState());
   }
 
   function step() {
+    const vm = vmRef.current;
+
     if (!vm) {
       const msg = 'VM has not be initialized.';
       console.log(msg);
       throw msg;
     }
 
-    vm.tick()
+    vm.tick(vmState!.lastEventId + 1);
     setVmState(vm.getState());
   }
 
-  return {
+  const value = {
     vmState,
     controls: {
       loadProgram,
@@ -190,4 +73,6 @@ export function useVirtualMachine(): VMHook {
       step
     }
   };
+
+  return <VirtualMachineContext.Provider value={value}>{children}</VirtualMachineContext.Provider>
 }
