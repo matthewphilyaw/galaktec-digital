@@ -1,0 +1,69 @@
+.container {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+}
+
+.pipelineDetailContainer {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    gap: 0.25rem;
+    justify-content: space-evenly;
+}
+
+.stage {
+    width: 24ch;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.content {
+    padding: 0.25rem;
+    display: flex;
+}
+
+.left,
+.right {
+    display: flex;
+    flex-direction: column;
+}
+
+.left > div {
+    padding-right: 0.25rem;
+}
+
+
+.heading {
+    display: flex;
+    justify-content: center;
+    height: 1rem;
+    width: 100%;
+}
+
+.cycle {
+    height: 1rem;
+    width: 100%;
+}
+
+.cycle0 {
+    background: cyan;
+}
+
+.cycle1 {
+    background: red;
+}
+
+.cycle2 {
+    background: yellow;
+}
+
+.cycle3 {
+    background: pink;
+}
+
+.cycle4 {
+    background: white;
+}

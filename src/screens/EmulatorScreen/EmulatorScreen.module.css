@@ -13,10 +13,24 @@
     height: 100%;
 }
 
-
 .vertSpacer {
     box-sizing: border-box;
     margin-left: 4px;
     padding-top: 2rem;
     padding-bottom: 2rem;
+}
+
+.background {
+    min-height: 0;
+    border: 4px solid black;
+    background: linear-gradient(90deg, var(--accent-color-light) 0, transparent 2% 98%, var(--accent-color-light)),
+                linear-gradient(0deg, var(--accent-color-light) 0, transparent 2% 98%, var(--accent-color-light));
+    background-color: var(--accent-color);
+}
+
+.screenOverlay {
+    height: 100%;
+    width: 100%;
+
+    backdrop-filter: blur(100px);
 }

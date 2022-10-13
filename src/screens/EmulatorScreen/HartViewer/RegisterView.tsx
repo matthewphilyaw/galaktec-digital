@@ -1,83 +1,119 @@
 import styles from './RegisterView.module.css';
-import {H4} from '../../../components/Heading';
-
-interface RegisterLine {
-  index: number;
-  name: string;
-  aliases: string[];
-  value: string;
-}
+import {formatAsHex} from '../../../utils/number-formatting';
 
 export interface RegisterViewerWidgetProps {
-  registerValues: number[]
+  registerValues: number[];
+  numberPerColumn: number;
+  displayHex?: boolean;
 }
 
-const registerLookup: Record<number, { name: string, aliases: string[] }> = {
-  0: { name: 'x0', aliases: ['zero']},
-  1: { name: 'x1', aliases: ['ra']},
-  2: { name: 'x2', aliases: ['sp']},
-  3: { name: 'x3', aliases: ['gp']},
-  4: { name: 'x4', aliases: ['tp']},
-  5: { name: 'x5', aliases: ['t0']},
-  6: { name: 'x6', aliases: ['t1']},
-  7: { name: 'x7', aliases: ['t2']},
-  8: { name: 'x8', aliases: ['s0', 'fp']},
-  9: { name: 'x9', aliases: ['s1']},
-  10: { name: 'x10', aliases: ['a0']},
-  11: { name: 'x11', aliases: ['a1']},
-  12: { name: 'x12', aliases: ['a2']},
-  13: { name: 'x13', aliases: ['a3']},
-  14: { name: 'x14', aliases: ['a4']},
-  15: { name: 'x15', aliases: ['a5']},
-  16: { name: 'x16', aliases: ['a6']},
-  17: { name: 'x17', aliases: ['a7']},
-  18: { name: 'x18', aliases: ['s2']},
-  19: { name: 'x19', aliases: ['s3']},
-  20: { name: 'x20', aliases: ['s4']},
-  21: { name: 'x21', aliases: ['s5']},
-  22: { name: 'x22', aliases: ['s6']},
-  23: { name: 'x23', aliases: ['s7']},
-  24: { name: 'x24', aliases: ['s8']},
-  25: { name: 'x25', aliases: ['s9']},
-  26: { name: 'x26', aliases: ['s10']},
-  27: { name: 'x27', aliases: ['s11']},
-  28: { name: 'x28', aliases: ['t3']},
-  29: { name: 'x29', aliases: ['t4']},
-  30: { name: 'x30', aliases: ['t5']},
-  31: { name: 'x31', aliases: ['t6']},
+interface RegisterInfo {
+  name: string;
+  aliases: string[];
 }
 
-function formatRegisterValues(registers: number[]): RegisterLine[] {
-  return registers.map((v, i) => {
-    let value = '';
-    if (Math.abs(v) > 9999999) {
-      value = (v >>> 0).toString(16).padStart(8, '0');
-    }
-    else {
-      value = v.toString().padStart(8, ' ');
-    }
-    value = (v >>> 0).toString(16).padStart(8, '0');
+interface RegisterGroup {
+  registers: RegisterInfo[];
+  values: number[];
+}
+
+const registerNames: RegisterInfo[] = [
+  { name: 'x0', aliases: ['zero']},
+  { name: 'x1', aliases: ['ra']},
+  { name: 'x2', aliases: ['sp']},
+  { name: 'x3', aliases: ['gp']},
+  { name: 'x4', aliases: ['tp']},
+  { name: 'x5', aliases: ['t0']},
+  { name: 'x6', aliases: ['t1']},
+  { name: 'x7', aliases: ['t2']},
+  { name: 'x8', aliases: ['s0', 'fp']},
+  { name: 'x9', aliases: ['s1']},
+  { name: 'x10', aliases: ['a0']},
+  { name: 'x11', aliases: ['a1']},
+  { name: 'x12', aliases: ['a2']},
+  { name: 'x13', aliases: ['a3']},
+  { name: 'x14', aliases: ['a4']},
+  { name: 'x15', aliases: ['a5']},
+  { name: 'x16', aliases: ['a6']},
+  { name: 'x17', aliases: ['a7']},
+  { name: 'x18', aliases: ['s2']},
+  { name: 'x19', aliases: ['s3']},
+  { name: 'x20', aliases: ['s4']},
+  { name: 'x21', aliases: ['s5']},
+  { name: 'x22', aliases: ['s6']},
+  { name: 'x23', aliases: ['s7']},
+  { name: 'x24', aliases: ['s8']},
+  { name: 'x25', aliases: ['s9']},
+  { name: 'x26', aliases: ['s10']},
+  { name: 'x27', aliases: ['s11']},
+  { name: 'x28', aliases: ['t3']},
+  { name: 'x29', aliases: ['t4']},
+  { name: 'x30', aliases: ['t5']},
+  { name: 'x31', aliases: ['t6']},
+];
+
+function formatRegisterValue(value: number, hex: boolean) {
+  if (hex) {
+    return formatAsHex(value);
+  } else {
+    return value.toString().padStart(8, ' ');
+  }
+}
 
 
-    return {
-      index: i,
-      name: registerLookup[i].name.padStart(3, ' '),
-      aliases: registerLookup[i].aliases,
-      value
+function createColumns(registerValues: number[], numberPerGroup: number) {
+  const groups: RegisterGroup[] = [];
+
+
+  for (let i = 0; i < registerNames.length; i+= numberPerGroup) {
+    const group: RegisterGroup = {
+      registers: [],
+      values: []
     };
-  });
+
+    for (let groupIndex = 0; groupIndex < numberPerGroup && (i + groupIndex) < registerValues.length; groupIndex++) {
+      group.registers.push(registerNames[i + groupIndex]);
+      group.values.push(registerValues[i + groupIndex]);
+    }
+
+    groups.push(group);
+  }
+
+  return groups;
 }
 
-export default function RegisterView({ registerValues }: RegisterViewerWidgetProps) {
-  const formattedRegisters = formatRegisterValues(registerValues);
+function RegisterColumn(column: RegisterGroup, displayHex: boolean) {
   return (
-    <div className={styles['content']}>
-      {formattedRegisters.map((line) =>
-        <div className={styles['line']} key={line.name}>
-          <div className={styles['register']}>{line.name}|{(line.aliases.join(','))}</div>
-          <div className={styles['value']}>{line.value}</div>
-        </div>
-      )}
+    <div key={column.registers[0].name} className={styles.column}>
+      <div className={styles.registers}>
+        {column.registers.map(reg => (
+          <div key={reg.name} className={styles.register}>{reg.name} {(reg.aliases.join(' '))}</div>
+        ))}
+      </div>
+      <div className={styles.values}>
+        {column.values.map((val, i) => (
+          <div key={i} className={styles.value}>{formatRegisterValue(val, displayHex)}</div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function RegisterView({ registerValues, numberPerColumn, displayHex = false }: RegisterViewerWidgetProps) {
+  const groups = createColumns(registerValues, numberPerColumn);
+  const groupComponents = groups.map(col => RegisterColumn(col, displayHex));
+  const divider = (key: number) => <div key={key} className={styles.separator} />;
+  const groupWithDivider = [];
+
+  groupWithDivider.push(divider(0));
+  for (let i = 0; i < groupComponents.length; i++) {
+    groupWithDivider.push(groupComponents[i])
+    groupWithDivider.push(divider(i + 1));
+  }
+
+  return (
+    <div className={styles.content}>
+      {groupWithDivider}
     </div>
   );
 }

@@ -1,0 +1,38 @@
+.content {
+    --stage-size: 1.25rem;
+    --stage-gap: 0.125rem;
+    display: flex;
+    gap: var(--stage-gap);
+}
+
+.stages {
+    display: flex;
+    gap: var(--stage-gap);
+    flex-direction: column;
+    padding-right: 0.25rem;
+}
+
+.stages > label,
+.verticalPipeline > label {
+    font-size: x-small;
+    height: var(--stage-size);
+    width: var(--stage-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.states {
+    display: flex;
+}
+
+.verticalPipeline {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stage-gap);
+}
+
+.verticalPipeline > div {
+    height: var(--stage-size);
+    width: var(--stage-size);
+}

@@ -1,6 +1,7 @@
 import styles from './MemoryViewerWidget.module.css';
 import {MemoryRegionDump} from '../../virtual-machine/risc-v/cpu-cores/peripherals/memory';
 import Widget from '../../components/Widget';
+import {formatAsHex} from '../../utils/number-formatting';
 
 interface FormattedMemoryWord {
   value: string[];
@@ -29,7 +30,7 @@ function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[]
     const address = dump.regionInfo.startAddress + row;
 
     const line: FormattedMemoryLine = {
-      address: address.toString(16).padStart(8, '0'),
+      address: formatAsHex(address),
       words: []
     };
 
@@ -50,7 +51,7 @@ function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[]
       for (let word = 0; word < 4; word++) {
         const value = rbDv.getUint8(wordAddress + word);
 
-        formattedWord.value.push(value.toString(16).padStart(2, '0'));
+        formattedWord.value.push(formatAsHex(value, 2));
       }
 
     }

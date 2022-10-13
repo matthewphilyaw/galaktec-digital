@@ -10,13 +10,14 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  align-items: center;
   gap: 1rem;
+  font-size: smaller;
 
   --widget-plate-background-color: transparent;
-  --widget-plate-color: var(--primary-color);
+  --widget-plate-color: white;
   --widget-plate-radius: 5px 5px;
-  --widget-plate-border: 2px groove var(--alternate-background-color);
+  --widget-plate-border: 2px groove var(--background-color-dark);
   --widget-content-border-color: var(--alternate-background-color);
   --widget-content-background: var(--accent-color) radial-gradient(var(--accent-color) 80%, var(--accent-color-light) 100%);
   --widget-screw-primary-color: var(--background-color-light);
@@ -30,6 +31,7 @@
 
 .peripheralsWrapper {
   min-height: 0;
+  width: 100%;
 }
 
 .peripherals {
@@ -40,5 +42,6 @@
 
 .peripherals .memory {
   display: flex;
-  gap: 1rem
+  gap: 1rem;
+  justify-content: space-between;
 }

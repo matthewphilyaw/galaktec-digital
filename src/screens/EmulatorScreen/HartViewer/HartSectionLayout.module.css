@@ -5,12 +5,13 @@
 
 .heading {
     box-sizing: border-box;
+    padding-right: 0.5rem;
 }
 
 .heading h4 {
-    font-family: 'Roboto', 'sans-serif';
+    font-family: 'Roboto', 'monospace';
     font-weight: 400;
-    font-size: 0.75rem;
+    font-size: xx-small;
     text-transform: uppercase;
     writing-mode: vertical-lr;
     text-orientation: upright;
@@ -18,4 +19,6 @@
 
 .content {
     box-sizing: border-box;
+    width: 100%;
+    min-height: 0;
 }
