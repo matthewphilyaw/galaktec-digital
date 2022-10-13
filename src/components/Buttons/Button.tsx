@@ -1,5 +1,5 @@
 import styles from './Button.module.css';
-import {LayoutOrientation} from './utils';
+import {LayoutOrientation} from '../utils';
 
 export interface ButtonProps {
   text: string;

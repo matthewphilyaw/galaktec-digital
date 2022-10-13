@@ -1,6 +1,6 @@
 import styles from './MemoryViewerWidget.module.css';
 import {MemoryRegionDump} from '../../virtual-machine/risc-v/cpu-cores/peripherals/memory';
-import Widget from '../../components/Widget';
+import Widget from '../../components/layout/Widget';
 import {formatAsHex} from '../../utils/number-formatting';
 
 interface FormattedMemoryWord {

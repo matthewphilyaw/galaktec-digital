@@ -4,14 +4,14 @@ import {colorsInHex, MonakaiTheme} from '../../theme/theme';
 import {tags} from '@lezer/highlight';
 
 const primaryColorHex = colorsInHex.primaryColor.value;
-const backgroundColorHex = colorsInHex.backgroundColor.value;
+const backgroundColorHex = colorsInHex.accentColor.value;
 
 export const AssemblyTheme = EditorView.theme(
   {
     '&': {
       height: '100%',
       width: '100%',
-      background: colorsInHex.codeEditorBackground.value,
+      background: 'transparent',
       fontSize: '12pt'
     },
     '.cm-gutters': {

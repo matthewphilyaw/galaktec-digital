@@ -1,7 +1,7 @@
 import styles from './Plate.module.css'
 import Screw from './Screw';
 import {ReactNode, useEffect, useRef} from 'react';
-import {LayoutOrientation} from './utils';
+import {LayoutOrientation} from '../utils';
 
 export interface HeaderPlateProps {
   children?: ReactNode;

@@ -1,7 +1,7 @@
 import styles from './Console.module.css';
 import {useEffect, useRef} from 'react';
 import {VMState} from '../../hooks/vm-wrapper';
-import Widget from '../../components/Widget';
+import Widget from '../../components/layout/Widget';
 
 export interface ConsoleProps {
   vmState: VMState

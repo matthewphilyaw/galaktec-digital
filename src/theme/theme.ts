@@ -45,11 +45,11 @@ export const colorsInHex: ThemeColors = {
   },
   accentColorLight: {
     cssKey: '--accent-color-light',
-    value: 'hsl(227, 100%, 30%)'
+    value: 'hsl(227, 100%, 15%)'
   },
   accentColor: {
     cssKey: '--accent-color',
-    value: 'hsl(227, 100%, 12%)'
+    value: 'hsl(227, 100%, 8%)'
   },
   accentColorDark: {
     cssKey: '--accent-color-dark',

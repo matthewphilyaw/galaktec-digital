@@ -1,6 +1,6 @@
 import styles from './HartViewer.module.css';
 import {VMState} from '../../../hooks/vm-wrapper';
-import Widget from '../../../components/Widget';
+import Widget from '../../../components/layout/Widget';
 import RegisterView from './RegisterView';
 import HartSectionLayout from './HartSectionLayout';
 import PipelineView from './PipelineView';
@@ -37,7 +37,6 @@ export default function HartViewer({ vmState }: HartViewerProps) {
         <HartSectionLayout title={'Registers'}>
           <RegisterView registerValues={vmState.coreState.registers} numberPerColumn={6} displayHex={true}/>
         </HartSectionLayout>
-        <div className={styles.horizontalSpacer} />
         <HartSectionLayout title={'Pipeline'}>
           <div className={styles.pipelineGroup}>
             <PipelineView vmState={vmState} />

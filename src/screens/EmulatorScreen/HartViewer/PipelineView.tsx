@@ -3,7 +3,7 @@ import {VMState} from '../../../hooks/vm-wrapper';
 import {formatAsHex} from '../../../utils/number-formatting';
 import {InstructionFormat} from '../../../virtual-machine/risc-v/cpu-cores/decoded-instruction';
 import {ReactNode} from 'react';
-import {H4} from '../../../components/Heading';
+import {H4} from '../../../components/layout/Heading';
 
 export interface PipelineDetailViewProps {
   vmState: VMState;

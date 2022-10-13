@@ -1,6 +1,6 @@
 import styles from './Screw.module.css';
 import {useEffect, useRef, useState} from 'react';
-import {createNewBrightnessValue, RandomizeBrightnessMixin} from './utils';
+import {createNewBrightnessValue, RandomizeBrightnessMixin} from '../utils';
 
 export interface ScrewProps extends RandomizeBrightnessMixin { }
 

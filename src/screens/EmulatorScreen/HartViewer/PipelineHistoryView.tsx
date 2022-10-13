@@ -1,5 +1,5 @@
 import styles from './PipelineHistoryView.module.css';
-import {H4} from '../../../components/Heading';
+import {H4} from '../../../components/layout/Heading';
 
 interface PipelineColor {
   fetch: string;

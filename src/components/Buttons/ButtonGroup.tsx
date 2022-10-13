@@ -1,4 +1,4 @@
-import {LayoutOrientation} from './utils';
+import {LayoutOrientation} from '../utils';
 import Button, {ButtonProps} from './Button';
 import styles from './ButtonGroup.module.css';
 

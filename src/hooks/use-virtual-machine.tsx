@@ -1,10 +1,8 @@
 import {VM, VMState} from './vm-wrapper';
 import {createContext, ReactNode, useContext, useRef, useState} from 'react';
-import {sampleProgram} from '../virtual-machine/default-program';
 
 export interface VMControls {
   loadProgram: (program: string) => void;
-  run: () => void;
   step: () => void;
 }
 
@@ -34,24 +32,6 @@ export function VirtualMachineProvider({ children }: VirtualMachineProviderProps
     setVmState(vm.getState());
   }
 
-  function run() {
-    const vm = vmRef.current;
-
-    if (!vm) {
-      const msg = 'VM has not be initialized.';
-      console.log(msg);
-      throw new Error(msg);
-    }
-
-    let lastEventId = vmState!.lastEventId;
-    do {
-      lastEventId++;
-      vm.tick(lastEventId);
-    } while (vm.getState().coreState.pipelineState !== 'fetch' && !vm.getState().error);
-
-    setVmState(vm.getState());
-  }
-
   function step() {
     const vm = vmRef.current;
 
@@ -69,7 +49,6 @@ export function VirtualMachineProvider({ children }: VirtualMachineProviderProps
     vmState,
     controls: {
       loadProgram,
-      run,
       step
     }
   };

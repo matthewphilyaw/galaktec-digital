@@ -1,17 +1,9 @@
 .content {
     font-family: 'Roboto Mono', 'monospace';
     font-weight: 400;
-    line-height: 1.2;
     display: flex;
+    gap: 0.5rem;
     flex-direction: column;
-}
-
-.horizontalSpacer {
-    box-sizing: border-box;
-    margin: 0.5rem 0;
-    height: 1px;
-    width: 100%;
-    background: linear-gradient(90deg, transparent 0, #ffffff 50%, transparent 100%);
 }
 
 .pipelineGroup {

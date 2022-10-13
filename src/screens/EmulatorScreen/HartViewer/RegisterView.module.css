@@ -5,6 +5,7 @@
     justify-content: space-between;
     gap: 0.5rem;
     width: 100%;
+    padding: 0 0.5rem;
 }
 
 .column {
@@ -26,8 +27,4 @@
 .separator {
     width: 1px;
     background: linear-gradient(0, transparent 0, white 50%, transparent 100%);
-}
-
-.value {
-
 }

@@ -1,6 +1,6 @@
 import {ReactNode} from 'react';
 import styles from './HartSectionLayout.module.css';
-import {H4} from '../../../components/Heading';
+import {H4} from '../../../components/layout/Heading';
 
 export interface HartSectionLayoutProps {
   title: string;

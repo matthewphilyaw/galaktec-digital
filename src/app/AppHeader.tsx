@@ -1,7 +1,7 @@
 import styles from './AppHeader.module.css';
-import Plate from '../components/Plate';
-import FlexCenteredContent from '../components/FlexCenteredContent';
-import {H1, H2} from '../components/Heading';
+import Plate from '../components/layout/Plate';
+import FlexCenteredContent from '../components/layout/FlexCenteredContent';
+import {H1, H2} from '../components/layout/Heading';
 import gitHubLogo from '../images/GitHub-Mark-64px.png';
 
 export interface AppHeaderProps {
