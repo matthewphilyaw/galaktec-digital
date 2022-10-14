@@ -2,7 +2,6 @@ const OPCODE_MASK   = 0x7f;
 const REGISTER_MASK = 0x1f;
 const FUNC3_MASK    = 0x7;
 const FUNC7_MASK    = 0x7F;
-const IMM_12        = 0xFFF;
 const IMM_U20        = 0xFFFFF;
 
 function opcode(opcode: number): number {

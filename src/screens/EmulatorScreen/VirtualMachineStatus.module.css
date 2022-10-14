@@ -1,16 +1,16 @@
 .container {
-  --button-background: var(--accent-color);
-  --button-color: white;
+  --button-background: var(--background-color);
+  --button-color: var(--primary-color-light);
   --button-font-size: 0.75rem;
-  --button-border: 1px solid white;
+  --button-border: 1px solid var(--primary-color-light);
 
   --button-hover-border: 1px solid white;
-  --button-hover-background: white;
-  --button-hover-color: var(--accent-color);
+  --button-hover-background: var(--primary-color-light);
+  --button-hover-color: var(--button-background);
 
   --button-active-border: 1px solid white;
-  --button-active-background: var(--accent-color-light);
-  --button-active-color: white;
+  --button-active-background: var(--button-background);
+  --button-active-color: var(--primary-color-light);
 
   --button-group-gap: 0.5rem;
   padding: 1rem;

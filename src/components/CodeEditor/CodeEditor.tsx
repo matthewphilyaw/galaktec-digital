@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { useCodeMirror } from '@uiw/react-codemirror';
+import React, {useEffect, useRef} from 'react';
+import {useCodeMirror} from '@uiw/react-codemirror';
 import styles from './CodeEditor.module.css';
 import {AssemblySetup} from './code-mirror-setup';
 import {AssemblyTheme} from './code-mirror-theme';
@@ -13,7 +13,7 @@ export default function CodeEditor(props: CodeEditorProps) {
   const { initialProgram, onChange} = props;
 
   const editor = useRef<HTMLDivElement>(null);
-  const { setContainer, state } = useCodeMirror({
+  const { setContainer } = useCodeMirror({
     container: editor.current,
     value: initialProgram,
     basicSetup: false,
@@ -28,7 +28,7 @@ export default function CodeEditor(props: CodeEditorProps) {
     if (editor.current) {
       setContainer(editor.current);
     }
-  }, [editor.current]);
+  }, [setContainer]);
 
   return (
     <div className={styles.container}>

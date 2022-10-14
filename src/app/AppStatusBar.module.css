@@ -2,13 +2,10 @@
     height: var(--status-bar-height);
     width: 100%;
     box-sizing: border-box;
-    border-top: 1px solid black;
-    box-shadow: 0 0 5px 2px black;
+    border-top: 1px solid var(--primary-color-light);
 
-    --plate-background-color: var(--primary-color);
+    --plate-background-color: var(--primary-color-light);
     --plate-color: var(--background-color);
-    --plate-screw-primary-color: var(--primary-color-dark);
-    --plate-screw-accent-color: var(--background-color-light);
 }
 
 .poweredByLabel {
@@ -16,5 +13,4 @@
     width: fit-content;
 
     --plate-border-radius: 0 0 30px 10px;
-    --plate-box-shadow: 0 0 15px 2px black;
 }

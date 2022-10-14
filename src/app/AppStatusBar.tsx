@@ -3,7 +3,7 @@ import Plate from '../components/layout/Plate';
 import FlexCenteredContent from '../components/layout/FlexCenteredContent';
 import {H4} from '../components/layout/Heading';
 
-export default function AppSatusBar() {
+export default function AppStatusBar() {
   return (
     <div className={styles.statusBar}>
       <div className={styles.poweredByLabel}>

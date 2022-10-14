@@ -25,13 +25,10 @@ export default function EmulatorScreen() {
   }
 
   return (
-    <div className={styles.display}>
-      <div className={styles.content}>
-        <div className={styles.spacer}/>
-        <CodeEditor initialProgram={sampleProgram} onChange={updateProgramRef}/>
-        <div className={styles.vertSpacer} />
-        <VirtualMachineStatus vmState={vmState} buttons={buttons} />
-      </div>
+    <div className={styles.content}>
+      <CodeEditor initialProgram={sampleProgram} onChange={updateProgramRef}/>
+      <div className={styles.vertSpacer} />
+      <VirtualMachineStatus vmState={vmState} buttons={buttons} />
     </div>
   );
 }

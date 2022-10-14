@@ -1,12 +1,19 @@
-import { Instruction, Label } from '../..//grammar/assembly-statements';
+import {Instruction, Label} from '../..//grammar/assembly-statements';
 import {
-  encodeRType,
-  R_TYPE_PATTERN,
+  B_TYPE_PATTERN,
+  encodeBType,
   encodeIType,
+  encodeJType,
+  encodeRType,
+  encodeSType,
+  encodeUType,
   I_TYPE_PATTERN,
-  encodeSType, S_TYPE_PATTERN, encodeBType, B_TYPE_PATTERN, encodeUType, U_TYPE_PATTERN, encodeJType, J_TYPE_PATTERN
+  J_TYPE_PATTERN,
+  R_TYPE_PATTERN,
+  S_TYPE_PATTERN,
+  U_TYPE_PATTERN,
 } from './instruction-type-encoder';
-import { binWord, Chunk } from '../../utils/binary-string-formatter';
+import {binWord, Chunk} from '../../utils/binary-string-formatter';
 
 export type Intermediate = IntermediateLabel | IntermediateInstruction;
 

@@ -1,9 +1,4 @@
 .plate {
-    --screw-rotation-degrees: 45deg;
-    --screw-primary-color: var(--plate-screw-primary-color, var(--plate-color));
-    --screw-accent-color: var(--plate-screw-accent-color, var(--plate-background-color));
-    --screw-box-shadow: 0 0 3px 2px black;
-
     background: var(--plate-background-color);
     color: var(--plate-color);
     border-radius: var(--plate-border-radius);
@@ -16,10 +11,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.plate.horizontal {
-
 }
 
 .plate.vertical {
@@ -39,14 +30,4 @@
 .plate.vertical .content {
     height: 100%;
     padding: var(--plate-content-padding, 1rem 0);
-}
-
-.plate.horizontal.withScrew {
-    --screw-diameter: var(--plate-screw-diameter, 1rem);
-    padding: var(--plate-edge-padding, 0.25rem 1rem);
-}
-
-.plate.vertical.withScrew {
-    --screw-diameter: var(--plate-screw-diameter, 1rem);
-    padding: var(--plate-edge-padding, 1rem 0.25rem);
 }

@@ -1,6 +1,6 @@
 import {MemoryController, MemoryRegion} from './peripherals/memory';
 import {FullOpcodeConstants, OpcodeGroupsConstants} from './opcode';
-import {signExtend, unsignedValue} from '../../utils/bit-manipulation';
+import {signExtend} from '../../utils/bit-manipulation';
 import {DecodedInstruction, InstructionFormat} from './decoded-instruction';
 import {executeInstruction, ExecutionResult} from './stages/execute-instruction';
 

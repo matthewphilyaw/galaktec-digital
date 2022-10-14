@@ -27,9 +27,9 @@ export default function AppHeader({ screenName }: AppHeaderProps) {
         </Plate>
       </div>
       <div className={styles.repoLink}>
-        <Plate withScrews={false}>
+        <Plate>
           <FlexCenteredContent>
-            <a href={'https://github.com/matthewphilyaw/galaktec-digital'} target={'_blank'}><img src={gitHubLogo} alt={'repo link'}/></a>
+            <a href={'https://github.com/matthewphilyaw/galaktec-digital'} target={'_blank'} rel="noreferrer"><img src={gitHubLogo} alt={'repo link'}/></a>
           </FlexCenteredContent>
         </Plate>
       </div>

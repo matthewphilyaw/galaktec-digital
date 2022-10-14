@@ -30,7 +30,7 @@
 
 .wordHighlight {
     background: white;
-    color: var(--accent-color-light);
+    color: var(--background-color-light);
 }
 
 .address {

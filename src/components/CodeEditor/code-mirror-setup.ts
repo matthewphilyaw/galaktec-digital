@@ -1,4 +1,4 @@
-import {keymap, drawSelection, lineNumbers} from '@codemirror/view';
+import {drawSelection, keymap, lineNumbers} from '@codemirror/view';
 import {Extension} from '@codemirror/state';
 import {defaultKeymap, history, historyKeymap} from '@codemirror/commands';
 import {indentUnit, StreamLanguage, syntaxHighlighting} from '@codemirror/language';

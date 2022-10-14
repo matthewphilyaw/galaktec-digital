@@ -1,10 +1,7 @@
 import {EditorView} from '@codemirror/view';
 import {HighlightStyle} from '@codemirror/language';
-import {colorsInHex, MonakaiTheme} from '../../theme/theme';
+import {colors, MonakaiTheme} from '../../theme/theme';
 import {tags} from '@lezer/highlight';
-
-const primaryColorHex = colorsInHex.primaryColor.value;
-const backgroundColorHex = colorsInHex.accentColor.value;
 
 export const AssemblyTheme = EditorView.theme(
   {
@@ -12,11 +9,11 @@ export const AssemblyTheme = EditorView.theme(
       height: '100%',
       width: '100%',
       background: 'transparent',
-      fontSize: '12pt'
+      fontSize: 'smaller'
     },
     '.cm-gutters': {
-      background: backgroundColorHex,
-      color: colorsInHex.primaryColor.value,
+      background: 'transparent',
+      color: colors.primaryColor.value,
       boxShadow: '0 0 5px 2px black',
       fontFamily: "'Roboto Mono', monospace",
       fontWeight: '500'
@@ -28,17 +25,16 @@ export const AssemblyTheme = EditorView.theme(
       fontFamily: "'Roboto Mono', monospace",
       fontWeight: '300'
     },
-
     '&.cm-focused .cm-cursor': {
-      borderLeftColor: primaryColorHex,
+      borderLeftColor: colors.primaryColorLight.value,
     },
     '.cm-scroller': {overflow: 'auto'},
 
     '&.cm-focused .cm-selectionBackground, ::selection': {
-      background: colorsInHex.codeEditorSelectionActive.value,
+      background: colors.codeEditorSelectionActive.value,
     },
     '.cm-selectionBackground, ::selection': {
-      background: colorsInHex.codeEditorSelectionInActive.value,
+      background: colors.codeEditorSelectionInActive.value,
     },
   },
   {

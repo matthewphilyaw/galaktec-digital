@@ -1,4 +1,4 @@
-import { Token } from 'moo';
+import {Token} from 'moo';
 
 export class PseudoRelocation {
   constructor(

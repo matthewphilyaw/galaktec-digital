@@ -1,5 +1,4 @@
 import styles from './PipelineHistoryView.module.css';
-import {H4} from '../../../components/layout/Heading';
 
 interface PipelineColor {
   fetch: string;
@@ -29,11 +28,11 @@ function VerticalPipline({label, colors}: PipelineSate) {
 
 export default function PipelineHistoryView() {
   const pipelineStates: PipelineSate[] = [
-    { label: '-4', colors: { fetch: 'white', decode: '', execute: '', memory: '', writeBack: '' }},
-    { label: '-3', colors: { fetch: 'pink', decode: 'white', execute: '', memory: '', writeBack: '' }},
-    { label: '-2', colors: { fetch: 'yellow', decode: 'pink', execute: 'white', memory: '', writeBack: '' }},
-    { label: '-1', colors: { fetch: 'red', decode: 'yellow', execute: 'pink', memory: 'white', writeBack: '' }},
-    { label: '0', colors: { fetch: 'cyan', decode: 'red', execute: 'yellow', memory: 'pink', writeBack: 'white' }}
+    { label: '-4', colors: { fetch: 'fuchsia', decode: '', execute: '', memory: '', writeBack: '' }},
+    { label: '-3', colors: { fetch: 'lime', decode: 'fuchsia', execute: '', memory: '', writeBack: '' }},
+    { label: '-2', colors: { fetch: 'yellow', decode: 'lime', execute: 'fuchsia', memory: '', writeBack: '' }},
+    { label: '-1', colors: { fetch: 'red', decode: 'yellow', execute: 'lime', memory: 'fuchsia', writeBack: '' }},
+    { label: '0', colors: { fetch: 'aqua', decode: 'red', execute: 'yellow', memory: 'lime', writeBack: 'fuchsia' }}
   ];
 
   return (
