@@ -2,9 +2,9 @@
     height: var(--status-bar-height);
     width: 100%;
     box-sizing: border-box;
-    border-top: 1px solid var(--primary-color-light);
+    border-top: 1px solid var(--primary-color);
 
-    --plate-background-color: var(--primary-color-light);
+    --plate-background-color: var(--primary-color);
     --plate-color: var(--background-color);
 }
 

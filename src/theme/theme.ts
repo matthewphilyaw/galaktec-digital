@@ -31,35 +31,35 @@ export interface ThemeColors {
 export const colors: ThemeColors = {
   primaryColorLight: {
     cssKey: '--primary-color-light',
-    value: 'hsl(0 0% 100%)'
+    value: 'hsl(180,100%,80%)'
   },
   primaryColor: {
     cssKey: '--primary-color',
-    value: 'hsl(0 0% 90%)'
+    value: 'hsl(180,100%,50%)'
   },
   primaryColorDark: {
     cssKey: '--primary-color-dark',
-    value: 'hsl(0 0% 75%)'
+    value: 'hsl(180,100%,40%)'
   },
   accentColorLight: {
     cssKey: '--accent-color-light',
-    value: 'hsl(240 100% 10%)'
+    value: 'hsl(0 0% 100%)'
   },
   accentColor: {
     cssKey: '--accent-color',
-    value: 'hsl(240 100% 6%)'
+    value: 'hsl(0 0% 90%)'
   },
   accentColorDark: {
     cssKey: '--accent-color-dark',
-    value: 'hsl(240 100% 6%)'
+    value: 'hsl(0 0% 85%)'
   },
   backgroundColorLight: {
     cssKey: '--background-color-light',
-    value: 'hsl(240 100% 10%)'
+    value: 'hsl(0,0%,12%)'
   },
   backgroundColor: {
     cssKey: '--background-color',
-    value: 'hsl(240 100% 6%)'
+    value: 'hsl(0,0%,8%)'
   },
   backgroundColorDark: {
     cssKey: '--background-color-dark',

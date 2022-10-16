@@ -4,6 +4,7 @@ import {sampleProgram} from '../../virtual-machine/default-program';
 import {useVirtualMachineContext} from '../../hooks/use-virtual-machine';
 import {useEffect, useRef} from 'react';
 import VirtualMachineStatus from './VirtualMachineStatus';
+import ButtonGroup from '../../components/Buttons/ButtonGroup';
 
 export default function EmulatorScreen() {
   const programRef = useRef(sampleProgram);
@@ -28,6 +29,9 @@ export default function EmulatorScreen() {
     <div className={styles.content}>
       <CodeEditor initialProgram={sampleProgram} onChange={updateProgramRef}/>
       <div className={styles.vertSpacer} />
+      <div className={styles.buttons}>
+        <ButtonGroup buttons={buttons} layoutOrientation={'vertical'}/>
+      </div>
       <VirtualMachineStatus vmState={vmState} buttons={buttons} />
     </div>
   );

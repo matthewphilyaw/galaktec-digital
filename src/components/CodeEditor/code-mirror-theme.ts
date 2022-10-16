@@ -14,7 +14,6 @@ export const AssemblyTheme = EditorView.theme(
     '.cm-gutters': {
       background: 'transparent',
       color: colors.primaryColor.value,
-      boxShadow: '0 0 5px 2px black',
       fontFamily: "'Roboto Mono', monospace",
       fontWeight: '500'
     },
@@ -23,7 +22,7 @@ export const AssemblyTheme = EditorView.theme(
     },
     '.cm-content': {
       fontFamily: "'Roboto Mono', monospace",
-      fontWeight: '300'
+      fontWeight: '500'
     },
     '&.cm-focused .cm-cursor': {
       borderLeftColor: colors.primaryColorLight.value,

@@ -15,9 +15,6 @@ export default function VirtualMachineStatus({vmState, buttons}: VirtualMachineS
   return (
     <div className={styles.container}>
       <div className={styles.space}>
-        <div className={styles.buttons}>
-          <ButtonGroup buttons={buttons} layoutOrientation={'horizontal'}/>
-        </div>
         <div className={styles.hart}>
           <HartViewer vmState={vmState}/>
         </div>
