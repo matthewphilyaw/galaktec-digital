@@ -1,0 +1,28 @@
+.widget {
+    --header-height: var(--widget-header-height, 1.75rem);
+
+    box-sizing: border-box;
+    width: var(--widget-width, fit-content);
+    min-height: 0;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.header > h4 {
+    padding: 0.5rem 2rem;
+}
+
+.spacer {
+    height: 1px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent 0, var(--primary-color) 5% 95%, transparent 100%);
+}
+
+.content {
+    padding: 0.5rem;
+    min-height: 0;
+}

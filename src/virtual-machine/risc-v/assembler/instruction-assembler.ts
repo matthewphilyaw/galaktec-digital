@@ -1,14 +1,16 @@
 import * as astat from '../../grammar/assembly-statements';
-import { Instruction, PseudoRelocation, Offset } from '../../grammar/assembly-statements';
-import { Token } from 'moo';
-import { AssemblerError } from './assembler';
-import { REGISTER_MAP } from './resgisters';
+import {Instruction, Offset, PseudoRelocation} from '../../grammar/assembly-statements';
+import {Token} from 'moo';
+import {AssemblerError} from './assembler';
+import {REGISTER_MAP} from './resgisters';
 import {
   IntermediateInstruction,
-  ITypeIntermediate, RTypeIntermediate,
-  SBTypeIntermediate, UJTypeIntermediate
-} from "./intermediate-types";
-import { SymbolTable } from './symbol-table';
+  ITypeIntermediate,
+  RTypeIntermediate,
+  SBTypeIntermediate,
+  UJTypeIntermediate,
+} from './intermediate-types';
+import {SymbolTable} from './symbol-table';
 
 export abstract class InstructionAssembler {
   protected opcode: number;

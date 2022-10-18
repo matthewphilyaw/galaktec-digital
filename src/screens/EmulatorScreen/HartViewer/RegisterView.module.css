@@ -5,6 +5,7 @@
     justify-content: space-between;
     gap: 0.5rem;
     width: 100%;
+    padding: 0 0.5rem;
 }
 
 .column {
@@ -20,14 +21,10 @@
 
 .register {
     box-sizing: border-box;
-    color: lightgrey;
+    color: var(--primary-color-light);
 }
 
 .separator {
     width: 1px;
-    background: linear-gradient(0, transparent 0, white 50%, transparent 100%);
-}
-
-.value {
-
+    background: linear-gradient(0, transparent 0, var(--primary-color) 50%, transparent 100%);
 }

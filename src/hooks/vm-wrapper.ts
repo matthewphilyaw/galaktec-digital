@@ -1,12 +1,11 @@
 import {MemoryRegion, MemoryRegionDump} from '../virtual-machine/risc-v/cpu-cores/peripherals/memory';
 import {CoreState, ProtoCore} from '../virtual-machine/risc-v/cpu-cores/proto-core';
-import {IntermediateInstruction} from '../virtual-machine/risc-v/assembler/intermediate-types';
 import {assemble, AssemblerContext, AssemblerError} from '../virtual-machine/risc-v/assembler/assembler';
 
 const programMemory: MemoryRegion = {
   regionName: 'program',
   startAddress: 0x0,
-  lengthInBytes: 2048,
+  lengthInBytes: 512,
   accessWidthInBytes: 1,
   clockCyclesForWrite: 4,
   clockCyclesForRead: 4,
@@ -16,8 +15,8 @@ const programMemory: MemoryRegion = {
 // Yes I know Random Access Memory Memory...
 const ramMemory: MemoryRegion = {
   regionName: 'ram',
-  startAddress: 0x800,
-  lengthInBytes: 1024,
+  startAddress: 0x200,
+  lengthInBytes: 256,
   accessWidthInBytes: 1,
   clockCyclesForWrite: 1,
   clockCyclesForRead: 1,
@@ -36,14 +35,18 @@ export interface ConsoleLine {
 }
 
 export interface VMState {
-  coreState: CoreState;
-  fetchedInstructionContext?: IntermediateInstruction;
-  currentInstructionContext?: IntermediateInstruction;
+  coreStates: CoreState[];
   programDump: MemoryRegionDump;
   ramDump: MemoryRegionDump;
   consoleBuffer: ConsoleLine[];
   error: Boolean;
   lastEventId: number;
+  getAddressColor: (address?: number) => string;
+}
+
+export interface AddressColorMapValue {
+  count: number;
+  color: string;
 }
 
 export class VM {
@@ -54,12 +57,18 @@ export class VM {
   private assemblerCtx?: AssemblerContext;
   private readonly consoleBuffer: ConsoleLine[];
   private inErrorState: boolean;
+  private coreStates: CoreState[];
+  private addressColorMap: Map<number, AddressColorMapValue>;
+  private availableColors: string[];
 
   constructor(program: string) {
     this.program = program;
     this.core = new ProtoCore(protoMemoryLayout);
     this.consoleBuffer = [];
     this.inErrorState = false;
+    this.coreStates = [];
+    this.addressColorMap = new Map<number, AddressColorMapValue>();
+    this.availableColors = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
 
     try {
       this.assemblerCtx = assemble(program, programMemory.lengthInBytes);
@@ -77,6 +86,8 @@ export class VM {
 
       this.inErrorState = true;
     }
+
+    this.updateSlots();
   }
 
   setConsoleMessage(msg: string) {
@@ -86,37 +97,90 @@ export class VM {
     })
   }
 
-  getIntermediateInstruction(address: number): IntermediateInstruction | undefined {
-    const intermediate = this.assemblerCtx?.programMap.get(address);
-
-    if (!intermediate) {
-      this.setConsoleMessage(`Can't find intermediate at address: ${address.toString(16).padStart(8, '0')}`);
-    }
-
-    return intermediate;
-  }
-
   getState(): VMState {
-    const coreState = this.core.getState();
-    const currentAddress = this.core.getState().programCounter;
-
-    let fetchedInstructionContext = undefined;
-    if (coreState.pipelineState === 'decode') {
-      fetchedInstructionContext = this.getIntermediateInstruction(currentAddress);
-    }
-
-    let currentInstruction = this.getIntermediateInstruction(currentAddress);
-
     return {
-      coreState: this.core.getState(),
-      fetchedInstructionContext,
-      currentInstructionContext: currentInstruction,
+      coreStates: this.coreStates,
       ramDump: this.core.memoryController.getRegionDump('ram'),
       programDump: this.core.memoryController.getRegionDump('program'),
       consoleBuffer: this.consoleBuffer,
       error: this.inErrorState,
-      lastEventId: this.lastEventId
+      lastEventId: this.lastEventId,
+      getAddressColor: (number?: number) => this.getAddressColor(number)
     }
+  }
+
+  assignColor(address?: number) {
+    if (address === undefined) {
+      return;
+    }
+
+    const value = this.addressColorMap.get(address);
+    if (!value) {
+      const color = this.availableColors.pop();
+      if (!color) {
+        console.error('No color to assign for address:', address);
+        return;
+      }
+
+      this.addressColorMap.set(address, {
+        count: 0,
+        color
+      });
+
+      return;
+    }
+
+    value.count++;
+  }
+
+  removeColor(address?: number) {
+    if (address === undefined) {
+      return;
+    }
+
+    if (!this.addressColorMap.has(address)) {
+      return;
+    }
+
+    const value = this.addressColorMap.get(address);
+    if (!value) {
+      this.addressColorMap.delete(address);
+      return;
+    }
+
+
+    if (value.count === 0) {
+      this.availableColors.push(value.color);
+      this.addressColorMap.delete(address);
+    }
+
+    value.count--;
+  }
+
+  updateSlots(): void {
+    const latestCoreState = this.core.getState();
+
+    this.coreStates.unshift(latestCoreState);
+    if (this.coreStates.length > 9) {
+      const state = this.coreStates.pop();
+      this.removeColor(state?.pipelineState?.fetch?.fetchResult?.address);
+    }
+
+    this.assignColor(latestCoreState.pipelineState.fetch?.fetchResult?.address);
+  }
+
+  getAddressColor(address?: number): string {
+    if (address === undefined) {
+      return 'blank';
+    }
+
+    const value = this.addressColorMap.get(address);
+    if (!value) {
+      console.log('no color for address:', address);
+      return 'blank';
+    }
+
+    return value.color;
   }
 
   tick(eventId: number) {
@@ -133,6 +197,7 @@ export class VM {
 
     try {
       this.core.tick();
+      this.updateSlots();
     } catch(error) {
       if (error instanceof Error) {
         this.setConsoleMessage(error.message);

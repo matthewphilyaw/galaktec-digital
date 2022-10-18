@@ -4,7 +4,6 @@ import {sampleProgram} from '../virtual-machine/default-program';
 
 export interface VMControls {
   loadProgram: (program: string) => void;
-  run: () => void;
   step: () => void;
 }
 
@@ -23,31 +22,15 @@ export interface VirtualMachineProviderProps {
   children: ReactNode;
 }
 
+let vm = new VM(sampleProgram);
+
 export function VirtualMachineProvider({ children }: VirtualMachineProviderProps) {
-  const vmRef = useRef(new VM(''));
+  const vmRef = useRef(vm);
   const [vmState, setVmState] = useState<VMState>(vmRef.current.getState());
 
   function loadProgram(program: string) {
-    const vm = new VM(program);
+    vm = new VM(program);
     vmRef.current = vm;
-
-    setVmState(vm.getState());
-  }
-
-  function run() {
-    const vm = vmRef.current;
-
-    if (!vm) {
-      const msg = 'VM has not be initialized.';
-      console.log(msg);
-      throw new Error(msg);
-    }
-
-    let lastEventId = vmState!.lastEventId;
-    do {
-      lastEventId++;
-      vm.tick(lastEventId);
-    } while (vm.getState().coreState.pipelineState !== 'fetch' && !vm.getState().error);
 
     setVmState(vm.getState());
   }
@@ -69,7 +52,6 @@ export function VirtualMachineProvider({ children }: VirtualMachineProviderProps
     vmState,
     controls: {
       loadProgram,
-      run,
       step
     }
   };

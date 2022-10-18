@@ -15,6 +15,7 @@ declare var ws: any;
 
 import * as moo from 'moo';
 import * as astat from './assembly-statements';
+
 const empty = (): null => null;
 
 const lexer = moo.compile({
@@ -43,13 +44,13 @@ interface NearleyLexer {
   save: () => any;
   formatError: (token: NearleyToken) => string;
   has: (tokenType: string) => boolean;
-};
+}
 
 interface NearleyRule {
   name: string;
   symbols: NearleySymbol[];
   postprocess?: (d: any[], loc?: number, reject?: {}) => any;
-};
+}
 
 type NearleySymbol = string | { literal: any } | { test: (token: any) => boolean };
 
@@ -57,7 +58,7 @@ interface Grammar {
   Lexer: NearleyLexer | undefined;
   ParserRules: NearleyRule[];
   ParserStart: string;
-};
+}
 
 const grammar: Grammar = {
   // @ts-ignore

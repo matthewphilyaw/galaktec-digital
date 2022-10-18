@@ -105,11 +105,12 @@ export default function RegisterView({ registerValues, numberPerColumn, displayH
   const divider = (key: number) => <div key={key} className={styles.separator} />;
   const groupWithDivider = [];
 
-  groupWithDivider.push(divider(0));
-  for (let i = 0; i < groupComponents.length; i++) {
+  for (let i = 0; i < groupComponents.length - 1; i++) {
     groupWithDivider.push(groupComponents[i])
     groupWithDivider.push(divider(i + 1));
   }
+
+  groupWithDivider.push(groupComponents.slice(-1));
 
   return (
     <div className={styles.content}>

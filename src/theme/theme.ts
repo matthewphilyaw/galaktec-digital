@@ -24,76 +24,66 @@ export interface ThemeColors {
   backgroundColorLight: ThemeColor;
   backgroundColor: ThemeColor;
   backgroundColorDark: ThemeColor;
-  alternateBackground: ThemeColor;
-  codeEditorBackground: ThemeColor;
   codeEditorSelectionActive: ThemeColor;
   codeEditorSelectionInActive: ThemeColor;
 }
 
-export const colorsInHex: ThemeColors = {
+export const colors: ThemeColors = {
   primaryColorLight: {
     cssKey: '--primary-color-light',
-    value:'hsl(48, 100%, 60%)'
+    value: 'hsl(180,100%,80%)'
   },
   primaryColor: {
     cssKey: '--primary-color',
-    value:'hsl(48, 100%, 50%)'
+    value: 'hsl(180,100%,50%)'
   },
   primaryColorDark: {
     cssKey: '--primary-color-dark',
-    value:'hsl(48, 100%, 40%)'
+    value: 'hsl(180,100%,40%)'
   },
   accentColorLight: {
     cssKey: '--accent-color-light',
-    value: 'hsl(227, 100%, 30%)'
+    value: 'hsl(0 0% 100%)'
   },
   accentColor: {
     cssKey: '--accent-color',
-    value: 'hsl(227, 100%, 12%)'
+    value: 'hsl(0 0% 90%)'
   },
   accentColorDark: {
     cssKey: '--accent-color-dark',
-    value: 'hsl(227, 100%, 6%)'
+    value: 'hsl(0 0% 85%)'
   },
   backgroundColorLight: {
     cssKey: '--background-color-light',
-    value: 'hsl(0, 0%, 33%)'
+    value: 'hsl(0,0%,12%)'
   },
   backgroundColor: {
     cssKey: '--background-color',
-    value: 'hsl(0, 0%, 23%)'
+    value: 'hsl(0,0%,8%)'
   },
   backgroundColorDark: {
     cssKey: '--background-color-dark',
-    value: 'hsl(0, 0%, 13%)'
-  },
-  alternateBackground: {
-    cssKey: '--alternate-background-color',
-    value: 'hsla(0, 0%, 6%, 0.5)'
-  },
-  codeEditorBackground: {
-    cssKey: '--code-editor-background',
-    value: 'hsl(0, 0%, 6%)'
+    value: 'hsl(240 100% 3%)'
   },
   codeEditorSelectionActive: {
     cssKey: '--code-editor-selection-active',
-    value: '#3f3f4f'
+    value: 'hsl(240 100% 20%)'
   },
   codeEditorSelectionInActive: {
     cssKey: '--code-editor-selection-in-active',
-    value: '#3a3a3a'
+    value: 'hsl(240 100% 15%)'
   }
 };
 
 export function getListOfThemeColors(): ThemeColor[]  {
-  const colors = [];
+  const colorsList = [];
 
   let k: keyof ThemeColors;
-  for (k in colorsInHex) {
-    colors.push(colorsInHex[k]);
+  for (k in colors) {
+    colorsList.push(colors[k]);
   }
 
-  return colors;
+  return colorsList;
 }
 
 

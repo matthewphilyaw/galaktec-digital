@@ -7,7 +7,7 @@
     line-height: 1;
 
     min-height: 0;
-    height: 14rem;
+    max-height: 12rem;
     overflow-y: auto;
 }
 
@@ -30,7 +30,7 @@
 
 .wordHighlight {
     background: white;
-    color: var(--accent-color-light);
+    color: var(--background-color-light);
 }
 
 .address {
@@ -43,4 +43,49 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.125rem 0.25rem;
+}
+
+.a {
+    background: aqua;
+    color: var(--background-color);
+}
+
+.b {
+    background: red;
+    color: var(--accent-color-light);
+}
+
+.c {
+    background: yellow;
+    color: var(--background-color);
+}
+
+.d {
+    background: lime;
+    color: var(--background-color);
+}
+
+.e {
+    background: fuchsia;
+    color: var(--accent-color-light);
+}
+
+.f {
+    background: blue;
+    color: var(--accent-color-light);
+}
+
+.g {
+    background: white;
+    color: var(--background-color);
+}
+
+.h {
+    background: darkgreen;
+    color: var(--accent-color-light);
+}
+
+.i {
+    background: grey;
+    color: var(--accent-color-light);
 }

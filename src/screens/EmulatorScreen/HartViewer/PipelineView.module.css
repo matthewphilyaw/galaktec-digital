@@ -14,15 +14,19 @@
 
 .stage {
     width: 24ch;
-    height: auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
 }
 
 .content {
+    --line-height: 1.2em;
     padding: 0.25rem;
     display: flex;
+    justify-content: space-between;
+    line-height: var(--line-height);
+    height: calc(var(--line-height) * 9);
 }
 
 .left,
@@ -43,27 +47,61 @@
     width: 100%;
 }
 
+.bubble {
+    background:
+            linear-gradient(to top left,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0) calc(50% - 0.8px),
+                var(--primary-color) 50%,
+                rgba(0,0,0,0) calc(50% + 0.8px),
+                rgba(0,0,0,0) 100%),
+            linear-gradient(to top right,
+                rgba(0,0,0,0) 0%,
+                rgba(0,0,0,0) calc(50% - 0.8px),
+                var(--primary-color) 50%,
+                rgba(0,0,0,0) calc(50% + 0.8px),
+                rgba(0,0,0,0) 100%);
+    box-sizing: border-box;
+    border: 1px solid var(--primary-color);
+}
+
 .cycle {
     height: 1rem;
     width: 100%;
 }
 
-.cycle0 {
-    background: cyan;
+.a {
+    background: aqua;
 }
 
-.cycle1 {
+.b {
     background: red;
 }
 
-.cycle2 {
+.c {
     background: yellow;
 }
 
-.cycle3 {
-    background: pink;
+.d {
+    background: lime;
 }
 
-.cycle4 {
+.e {
+    background: fuchsia;
+}
+
+.f {
+    background: blue;
+}
+
+.g {
     background: white;
+}
+
+.h {
+    background: darkgreen;
+}
+
+.i {
+    background: grey;
 }

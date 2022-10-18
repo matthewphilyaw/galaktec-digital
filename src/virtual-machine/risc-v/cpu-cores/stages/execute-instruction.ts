@@ -1,6 +1,7 @@
 import {DecodedInstruction} from '../decoded-instruction';
 import {FullOpcodeConstants} from '../opcode';
 import {unsignedValue} from '../../../utils/bit-manipulation';
+import {InstructionState} from '../proto-core';
 
 export interface ExecutionResult {
   result: number;
@@ -47,13 +48,17 @@ executeMap.set(FullOpcodeConstants.OR, or);
 executeMap.set(FullOpcodeConstants.AND, and);
 executeMap.set(FullOpcodeConstants.XOR, xor);
 
-export function executeInstruction(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {
-  const execFunc = executeMap.get(decodedInstruction.fullOpcode);
-  if (!execFunc) {
-    throw new Error(`Unable to locate a function to run on FullOpCode(${decodedInstruction.fullOpcode})`);
+export function executeInstruction({ fetchResult, decodeResult }: InstructionState): ExecutionResult | undefined {
+  if (!fetchResult || !decodeResult) {
+    return;
   }
 
-  return truncateTo32(execFunc(pc, decodedInstruction));
+  const execFunc = executeMap.get(decodeResult.fullOpcode);
+  if (!execFunc) {
+    throw new Error(`Unable to locate a function to run on FullOpCode(${decodeResult.fullOpcode})`);
+  }
+
+  return truncateTo32(execFunc(fetchResult.address, decodeResult));
 }
 
 function unknownInstruction(pc: number, decodedInstruction: DecodedInstruction): ExecutionResult {

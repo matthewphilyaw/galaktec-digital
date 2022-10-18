@@ -1,8 +1,6 @@
 import styles from './Widget.module.css';
 import React from 'react';
-import Plate from './Plate';
 import {H4} from './Heading';
-import FlexCenteredContent from './FlexCenteredContent';
 
 interface WidgetProps {
   title?: string;
@@ -12,18 +10,12 @@ interface WidgetProps {
 export default function Widget({ title, children }: WidgetProps) {
   return (
     <div className={styles.widget}>
-      <div className={styles.headerPlate}>
-        <Plate>
-          <FlexCenteredContent>
-            <H4>{title}</H4>
-          </FlexCenteredContent>
-        </Plate>
+      <div className={styles.header}>
+        <H4>{title}</H4>
+        <div className={styles.spacer} />
       </div>
       <div className={styles.content}>
         { children }
-      </div>
-      <div className={styles.footer}>
-        <Plate/>
       </div>
     </div>
   );

@@ -1,41 +1,31 @@
 import styles from './PipelineHistoryView.module.css';
-import {H4} from '../../../components/Heading';
+import {PipelineState} from '../../../virtual-machine/risc-v/cpu-cores/proto-core';
+import {VMState} from '../../../hooks/vm-wrapper';
 
-interface PipelineColor {
-  fetch: string;
-  decode: string;
-  execute: string;
-  memory: string;
-  writeBack: string;
+export interface PipelineHistoryViewProps {
+  vmState: VMState;
 }
 
-interface PipelineSate {
+interface VerticalPipelineProps {
   label: string;
-  colors: PipelineColor;
+  pipelineState?: PipelineState;
+  getAddressColor: (address?: number) => string;
 }
 
-function VerticalPipline({label, colors}: PipelineSate) {
+function VerticalPipline({ label, pipelineState, getAddressColor }: VerticalPipelineProps) {
   return (
     <div className={styles.verticalPipeline}>
       <label className={styles.label}>{label}</label>
-      <div style={{background: colors.fetch}} />
-      <div style={{background: colors.decode}} />
-      <div style={{background: colors.execute}} />
-      <div style={{background: colors.memory}} />
-      <div style={{background: colors.writeBack}} />
+      <div className={styles[getAddressColor(pipelineState?.fetch?.fetchResult?.address)]} />
+      <div className={styles[getAddressColor(pipelineState?.decode?.fetchResult?.address)]} />
+      <div className={styles[getAddressColor(pipelineState?.execute?.fetchResult?.address)]} />
+      <div className={styles[getAddressColor(pipelineState?.memoryAccess?.fetchResult?.address)]} />
+      <div className={styles[getAddressColor(pipelineState?.writeBack?.fetchResult?.address)]} />
     </div>
   )
 }
 
-export default function PipelineHistoryView() {
-  const pipelineStates: PipelineSate[] = [
-    { label: '-4', colors: { fetch: 'white', decode: '', execute: '', memory: '', writeBack: '' }},
-    { label: '-3', colors: { fetch: 'pink', decode: 'white', execute: '', memory: '', writeBack: '' }},
-    { label: '-2', colors: { fetch: 'yellow', decode: 'pink', execute: 'white', memory: '', writeBack: '' }},
-    { label: '-1', colors: { fetch: 'red', decode: 'yellow', execute: 'pink', memory: 'white', writeBack: '' }},
-    { label: '0', colors: { fetch: 'cyan', decode: 'red', execute: 'yellow', memory: 'pink', writeBack: 'white' }}
-  ];
-
+export default function PipelineHistoryView({ vmState }: PipelineHistoryViewProps) {
   return (
     <div className={styles.content}>
       <div className={styles.stages}>
@@ -46,11 +36,11 @@ export default function PipelineHistoryView() {
         <label>MEM</label>
         <label>WB</label>
       </div>
-      <VerticalPipline {...pipelineStates[4]} />
-      <VerticalPipline {...pipelineStates[3]} />
-      <VerticalPipline {...pipelineStates[2]} />
-      <VerticalPipline {...pipelineStates[1]} />
-      <VerticalPipline {...pipelineStates[0]} />
+      <VerticalPipline label={'0'} pipelineState={vmState.coreStates[0]?.pipelineState} getAddressColor={vmState.getAddressColor} />
+      <VerticalPipline label={'-1'} pipelineState={vmState.coreStates[1]?.pipelineState} getAddressColor={vmState.getAddressColor} />
+      <VerticalPipline label={'-2'} pipelineState={vmState.coreStates[2]?.pipelineState} getAddressColor={vmState.getAddressColor} />
+      <VerticalPipline label={'-3'} pipelineState={vmState.coreStates[3]?.pipelineState} getAddressColor={vmState.getAddressColor} />
+      <VerticalPipline label={'-4'} pipelineState={vmState.coreStates[4]?.pipelineState} getAddressColor={vmState.getAddressColor} />
     </div>
   );
 }
