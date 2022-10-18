@@ -3,9 +3,14 @@ import {MemoryRegionDump} from '../../virtual-machine/risc-v/cpu-cores/periphera
 import Widget from '../../components/layout/Widget';
 import {formatAsHex} from '../../utils/number-formatting';
 
+export interface MemoryHighlight {
+  address: number,
+  color: string
+}
+
 interface FormattedMemoryWord {
   value: string[];
-  highlight: boolean;
+  highlight?: MemoryHighlight;
 }
 
 interface FormattedMemoryLine {
@@ -13,7 +18,7 @@ interface FormattedMemoryLine {
   words: FormattedMemoryWord[];
 }
 
-function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[], wordsPerRow?: number): FormattedMemoryLine[] {
+function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: MemoryHighlight[], wordsPerRow?: number): FormattedMemoryLine[] {
   const addrLines: FormattedMemoryLine[] = [];
 
   if (!dump) {
@@ -40,7 +45,7 @@ function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[]
 
       let formattedWord: FormattedMemoryWord = {
         value: [],
-        highlight: highlightAddresses?.includes(wordAddress) ?? false
+        highlight: highlightAddresses?.find(p => p.address === wordAddress)
       };
 
       line.words.push(formattedWord);
@@ -65,7 +70,7 @@ function formatMemoryDump(dump?: MemoryRegionDump, highlightAddresses?: number[]
 interface MemoryViewerWidgetProps {
   title: string;
   region: MemoryRegionDump;
-  highlightAddresses?: number[];
+  highlightAddresses?: MemoryHighlight[];
   wordsPerRow?: number;
 }
 
@@ -79,11 +84,11 @@ export default function MemoryViewerWidget({ title, region, highlightAddresses, 
           return (
             <div className={styles.line} key={line.address}>
               <div className={styles.address}>{line.address}</div>
-              <div className={styles.separator}></div>
+              <div className={styles.separator} />
               <div className={styles.wordLine}>
                 {line.words.map((word, i) => {
                   return (
-                    <div key={i} className={`${styles.word} ${word.highlight ? styles.wordHighlight : ''}`}>
+                    <div key={i} className={`${styles.word} ${word.highlight ? styles[word.highlight.color]: ''}`}>
                       {word.value.map((byte, i) => <div className={styles.valueByte} key={i}>{byte}</div>)}
                     </div>
                   )

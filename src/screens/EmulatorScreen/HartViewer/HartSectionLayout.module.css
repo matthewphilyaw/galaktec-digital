@@ -1,6 +1,7 @@
 .container {
     display: flex;
     align-items: center;
+    height: 100%;
 }
 
 .heading {
@@ -21,4 +22,5 @@
     box-sizing: border-box;
     width: 100%;
     min-height: 0;
+    height: 100%;
 }

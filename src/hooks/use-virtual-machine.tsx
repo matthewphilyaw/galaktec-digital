@@ -1,5 +1,6 @@
 import {VM, VMState} from './vm-wrapper';
 import {createContext, ReactNode, useContext, useRef, useState} from 'react';
+import {sampleProgram} from '../virtual-machine/default-program';
 
 export interface VMControls {
   loadProgram: (program: string) => void;
@@ -21,12 +22,14 @@ export interface VirtualMachineProviderProps {
   children: ReactNode;
 }
 
+let vm = new VM(sampleProgram);
+
 export function VirtualMachineProvider({ children }: VirtualMachineProviderProps) {
-  const vmRef = useRef(new VM(''));
+  const vmRef = useRef(vm);
   const [vmState, setVmState] = useState<VMState>(vmRef.current.getState());
 
   function loadProgram(program: string) {
-    const vm = new VM(program);
+    vm = new VM(program);
     vmRef.current = vm;
 
     setVmState(vm.getState());

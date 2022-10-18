@@ -15,12 +15,12 @@ export default function HartViewer({ vmState }: HartViewerProps) {
     <Widget title={'RISC V Hart'}>
       <div className={styles.content}>
         <HartSectionLayout title={'Registers'}>
-          <RegisterView registerValues={vmState.coreState.registers} numberPerColumn={6} displayHex={true}/>
+          <RegisterView registerValues={vmState.coreStates[0]?.registers} numberPerColumn={6} displayHex={true}/>
         </HartSectionLayout>
         <HartSectionLayout title={'Pipeline'}>
           <div className={styles.pipelineGroup}>
-            <PipelineView vmState={vmState} />
-            <PipelineHistoryView />
+            <PipelineView coreState={vmState.coreStates[0]} getAddressColor={vmState.getAddressColor} />
+            <PipelineHistoryView vmState={vmState} />
           </div>
         </HartSectionLayout>
       </div>

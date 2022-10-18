@@ -5,14 +5,30 @@ import {DecodedInstruction, InstructionFormat} from './decoded-instruction';
 import {executeInstruction, ExecutionResult} from './stages/execute-instruction';
 
 export interface CoreState {
-  pipelineState:  'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
+  pipelineState:  PipelineState;
   programCounter: number;
-  fetchedInstruction: number;
-  decodedInstruction?: DecodedInstruction;
-  ALUResult: number;
-  memoryAccessResult: number;
   registers: number[];
 
+}
+
+export interface FetchResult {
+  address: number;
+  instruction: number;
+}
+
+export interface PipelineState {
+  fetch?: InstructionState;
+  decode?: InstructionState;
+  execute?: InstructionState;
+  memoryAccess?: InstructionState;
+  writeBack?: InstructionState;
+}
+
+export interface InstructionState {
+  fetchResult?: FetchResult;
+  decodeResult?: DecodedInstruction
+  executeResult?: ExecutionResult;
+  memoryAccessResult?: number;
 }
 
 export class ProtoCore {
@@ -20,20 +36,13 @@ export class ProtoCore {
   private pc: number;
   private registers: number[] = new Array(32).fill(0);
 
-  private instruction: number;
-  private decodedInstruction?: DecodedInstruction;
-  private executionResult?: ExecutionResult;
-  private memoryAccessResult: number;
-
-  private state: 'fetch' | 'decode' | 'execute' | 'memory-access' | 'write-back';
+  private pipeLineState: PipelineState;
 
   constructor(memoryController: MemoryRegion[]) {
     this.memoryController = new MemoryController(memoryController);
     this.pc = 0;
-    this.state = 'fetch';
 
-    this.instruction = 0;
-    this.memoryAccessResult = 0;
+    this.pipeLineState = {};
   }
 
   loadProgram(programBuffer: ArrayBuffer): void {
@@ -47,61 +56,74 @@ export class ProtoCore {
 
   getState(): CoreState {
     return {
-      pipelineState:  this.state,
       programCounter: this.pc,
-      fetchedInstruction: this.instruction,
-      decodedInstruction: this.decodedInstruction,
-      ALUResult: this.executionResult?.result ?? 0,
-      memoryAccessResult: this.memoryAccessResult,
-      registers: this.registers
+      registers: this.registers,
+      pipelineState: this.pipeLineState,
     };
   }
 
   tick(): void {
-    switch (this.state) {
-      case 'fetch':
-        this.fetch();
-        this.state = 'decode';
-        break;
-      case 'decode':
-        this.decode();
-        this.state = 'execute';
-        break;
-      case 'execute':
-        this.executionResult = executeInstruction(this.pc, this.decodedInstruction!);
-        this.state = 'memory-access';
-        break;
-      case 'memory-access':
-        this.accessMemory();
-        this.state = 'write-back';
-        break;
-      case 'write-back':
-        this.writeRegisters();
-        this.state = 'fetch';
+    // map previous state to current state
+    let fetch: InstructionState | undefined = { };
+    let decode = this.pipeLineState.fetch;
+    const execute = this.pipeLineState.decode;
+    const memoryAccess = this.pipeLineState.execute;
+    const writeBack = this.pipeLineState.memoryAccess;
 
-        this.instruction = 0;
-        this.decodedInstruction = undefined;
-        this.memoryAccessResult = 0;
+    // do write back first, so the registers are updated for decode stage in this cycle
+    if (writeBack) {
+      this.writeRegisters(writeBack);
+    }
 
-        if (this.executionResult?.jumpTo === undefined) {
-          this.pc += 4;
-        } else {
-          this.pc = this.executionResult.jumpTo;
-        }
+    if (fetch) {
+      fetch.fetchResult = this.fetch(this.pc);
+    }
 
-        this.executionResult = undefined;
-        break;
-      default:
-        throw new Error('Invalid state');
+    if (decode) {
+      decode.decodeResult = this.decode(decode);
+    }
+
+    if (execute) {
+      execute.executeResult = executeInstruction(execute);
+    }
+
+    // if branch detected, insert bubbles in decode/fetch
+    // those instructions are no longer valid to process
+    if (execute?.executeResult?.jumpTo !== undefined) {
+      decode = undefined;
+      fetch = undefined;
+
+      this.pc = execute.executeResult.jumpTo;
+    } else {
+      this.pc += 4;
+    }
+
+    if (memoryAccess) {
+      memoryAccess.memoryAccessResult = this.accessMemory(memoryAccess);
+    }
+    // commit current state for next tick
+    this.pipeLineState = {
+      fetch,
+      decode,
+      execute,
+      memoryAccess,
+      writeBack
     }
   }
 
-  fetch(): void {
-    this.instruction = this.memoryController.readWord(this.pc);
+  fetch(pc: number): FetchResult {
+    return {
+      address: pc,
+      instruction: this.memoryController.readWord(pc)
+    };
   }
 
-  decode(): void {
-    const instruction = this.instruction;
+  decode({ fetchResult }: InstructionState): DecodedInstruction | undefined {
+    if (!fetchResult) {
+      return;
+    }
+
+    const instruction = fetchResult.instruction;
 
     const opcode = instruction & 0x7F;
     const funct3 = (instruction >>> 12) & 0x7;
@@ -217,128 +239,52 @@ export class ProtoCore {
         throw Error('Opcode not recognized!');
     }
 
-    this.decodedInstruction = decoded;
+    return decoded;
   }
 
-  accessMemory(): void {
-    const opcode = this.decodedInstruction!.fullOpcode & 0x7f;
-    // If no memory operation is needed then forward the value in execution along
-    if (opcode !== OpcodeGroupsConstants.LOAD && opcode !== OpcodeGroupsConstants.STORE) {
-      this.memoryAccessResult = this.executionResult!.result;
+  accessMemory({ decodeResult, executeResult } : InstructionState): number | undefined {
+    if (!decodeResult || !executeResult) {
       return;
     }
 
-    const address = this.executionResult!.result;
-    switch (this.decodedInstruction!.fullOpcode) {
+    const opcode = decodeResult.fullOpcode & 0x7f;
+    // If no memory operation is needed then forward the value in execution along
+    if (opcode !== OpcodeGroupsConstants.LOAD && opcode !== OpcodeGroupsConstants.STORE) {
+      return;
+    }
+
+    const address = executeResult.result;
+    let result = undefined;
+    switch (decodeResult.fullOpcode) {
       case FullOpcodeConstants.LW:
         // execution result will be a memory address
-        this.memoryAccessResult = this.memoryController.readWord(address);
+        result = this.memoryController.readWord(address);
         break;
       case FullOpcodeConstants.SW:
-        this.memoryController.writeWord(address, this.decodedInstruction!.secondRegisterValue);
+        this.memoryController.writeWord(address, decodeResult.secondRegisterValue);
         break;
       default:
         throw new Error('Opcode not supported');
     }
+
+    return result;
   }
 
-  writeRegisters(): void {
-    // These formats don't modify registers
-    if (this.decodedInstruction!.instructionFormat === InstructionFormat.S ||
-        this.decodedInstruction!.instructionFormat === InstructionFormat.B) {
+  // TODO: might need strong checks around which result to use vs checking for null
+  writeRegisters({ decodeResult, executeResult, memoryAccessResult}: InstructionState): void {
+    if (!decodeResult || !executeResult) {
       return;
     }
 
-    // this could be either a true value from memory or the result of an operation which was forwarded
-    // along the pipeline for simplicity
-    if (this.decodedInstruction!.destinationRegisterIndex !== 0) {
-      this.registers[this.decodedInstruction!.destinationRegisterIndex] = this.memoryAccessResult;
+    // These formats don't modify registers
+    if (decodeResult.instructionFormat === InstructionFormat.S ||
+        decodeResult.instructionFormat === InstructionFormat.B) {
+      return;
+    }
+
+    if (decodeResult.destinationRegisterIndex !== 0) {
+      this.registers[decodeResult.destinationRegisterIndex] = memoryAccessResult ?? executeResult.result;
     }
   }
 
 }
-
-/*
-
-|- IF
-|  - 1 cycle
-|  - 2 cycle
-|
-
-- ID
-- EX
-- ME
-- WB
-
-*/
-
-/**
- * Pipeline examples Notes
- *
- *   1 2 3 4 5 6 7 8 9 A B C D E F G
- *   F D X M M W
- *     F D X - M M W
- *       F D - X - M M W
- *         F - D - X - M M W
- *           - F - D - X - M M W
- *               - F - D - x - M M W
- *                   - F - D - X - M M W
- *                       - F - D - X - M W
- *                           - F - D - X M W
- *                               - F - D X M W
- *                                   - F D X M W
- *                                       F D X M W
- *
- *   1 2 3 4 5 6 7 8
- *   | | | | | | | |
- *   F D X M W                   - NOP
- *     F D X M W                 - NOP
- *       F D X M M W             - LW
- *         F D X - M W           - ADD
- *           F D - X M W         - ADD
- *             F - D X M W       - ADD
- *               - F D X M W     - ADD
- *
- *
- *   1 2 3 4 5 6 7 8
- *   | | | | | | | |
- *   F D X M W                               - NOP
- *     F D X M M W                           - LW
- *       F D X - M M W                       - LW
- *         F D - X - M M W                   - LW
- *           F - D - X - M M W               - LW
- *             - F - D - X - M M W           - LW
- *                   - F - D - X - M M W     - LW
- *
- *
- *
- * DONE every tick to simulate pipeline
- *
- * const fr = fetch.tick(this.pc);
- *
- * if (decode.stalled) {
- *   fetch.stall(); // will produce the same result next tick - effectively persisting to next tick
- *                  // and PC will not be incremented.
- * }
- *
- * const dr = decode.tick(fr); // if stalled nothing is done with fr
- *
- * if (execute.stalled) {
- *   decode.stall();
- * }
- *
- * const er = execute.tick(dr);
- *
- * if (mem.stalled) { // should stall on second tick for mem not first
- *  execute.stall();
- * }
- *
- * const mr = mem.tick(er);
- *
- * if (wb.stalled) {
- *  mem.stall();
- * }
- *
- * mb.tick(mr);
- *
- */
