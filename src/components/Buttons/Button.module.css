@@ -11,12 +11,16 @@
     padding: var(--button-padding, 0.25rem 0.5rem);
     border: var(--button-border, 0);
     border-radius: var(--button-radius, 0);
+    height: 100%;
+    width: 100%;
 
     display: flex;
     align-items: center;
+    justify-content: center;
 }
 
 .button.vertical span {
+    box-sizing: border-box;
     writing-mode: vertical-lr;
     text-orientation: upright;
 }

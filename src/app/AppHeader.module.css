@@ -3,7 +3,6 @@
     height: var(--header-height);
     display: grid;
     grid-template-columns: 20rem auto 1fr;
-    border-bottom: 1px solid var(--primary-color);
 
     --plate-background-color: var(--primary-color);
     --plate-color: var(--background-color);

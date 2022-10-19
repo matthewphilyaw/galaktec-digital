@@ -3,7 +3,6 @@
 
     box-sizing: border-box;
     width: var(--widget-width, fit-content);
-    min-height: 0;
 }
 
 .header {

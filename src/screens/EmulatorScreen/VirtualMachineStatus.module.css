@@ -1,19 +1,5 @@
 .container {
-    --button-background: var(--background-color);
-    --button-color: var(--primary-color);
-    --button-font-size: 0.75rem;
-    --button-border: 1px solid var(--primary-color);
-
-    --button-hover-border: 1px solid var(--primary-color);
-    --button-hover-background: var(--primary-color);
-    --button-hover-color: var(--button-background);
-
-    --button-active-border: 1px solid var(--primary-color);
-    --button-active-background: var(--button-background);
-    --button-active-color: var(--primary-color);
-
-    --button-group-gap: 0.5rem;
-    padding: 1rem;
+    padding-left: 1rem;
     min-width: 0;
     min-height: 0;
     overflow-y: auto;

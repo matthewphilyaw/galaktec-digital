@@ -56,17 +56,11 @@ export default function VirtualMachineStatus({vmState, buttons}: VirtualMachineS
   return (
     <div className={styles.container}>
       <div className={styles.space}>
-        <div className={styles.hart}>
-          <HartViewer vmState={vmState}/>
-        </div>
-        <div className={styles.peripheralsWrapper}>
-          <div className={styles.peripherals}>
-            <MemoryViewerWidget title={'Program Memory'} region={vmState.programDump} wordsPerRow={12}
-                                highlightAddresses={highlights}/>
-            <MemoryViewerWidget title={'Random Access Memory'} region={vmState.ramDump} wordsPerRow={12}/>
-            <Console vmState={vmState}/>
-          </div>
-        </div>
+        <HartViewer vmState={vmState}/>
+        <MemoryViewerWidget title={'Program Memory'} region={vmState.programDump} wordsPerRow={12}
+                            highlightAddresses={highlights}/>
+        <MemoryViewerWidget title={'Random Access Memory'} region={vmState.ramDump} wordsPerRow={12}/>
+        <Console vmState={vmState}/>
       </div>
     </div>
   );

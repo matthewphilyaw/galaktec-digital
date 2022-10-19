@@ -5,8 +5,8 @@
     gap: var(--button-group-gap, 0.25rem);
     align-items: center;
     justify-content: center;
-    width: fit-content;
-    height: fit-content;
+    width: 100%;
+    height: 100%;
 }
 
 .group.horizontal {
