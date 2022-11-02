@@ -31,7 +31,6 @@ export const REGISTER_MAP: Readonly<Record<string, number>> = {
   'x29': 29,
   'x30': 30,
   'x31': 31,
-  'pc': 32,
   'zero': 0,
   'ra': 1,
   'sp': 2,

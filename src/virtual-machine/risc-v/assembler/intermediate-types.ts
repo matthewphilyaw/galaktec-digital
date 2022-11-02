@@ -1,4 +1,4 @@
-import {Instruction, Label} from '../..//grammar/assembly-statements';
+import {Instruction, Label} from '../../grammar/assembly-statements';
 import {
   B_TYPE_PATTERN,
   encodeBType,
